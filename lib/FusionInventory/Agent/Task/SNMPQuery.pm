@@ -129,7 +129,8 @@ sub StartThreads {
    my $nb_threads_query = $self->{SNMPQUERY}->{PARAM}->[0]->{THREADS_QUERY};
 	my $nb_core_query = $self->{SNMPQUERY}->{PARAM}->[0]->{CORE_QUERY};
 
-   if ( not eval { require Parallel::ForkManager; 1 } ) {
+    Parallel::ForkManager->require();
+   if ($@) {
       if ($nb_core_query > 1) {
          $self->{logger}->debug("Parallel::ForkManager not installed, so only 1 core will be used...");
          $nb_core_query = 1;      
