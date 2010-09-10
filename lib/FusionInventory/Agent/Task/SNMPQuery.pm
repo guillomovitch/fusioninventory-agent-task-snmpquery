@@ -1,9 +1,8 @@
 package FusionInventory::Agent::Task::SNMPQuery;
-our $VERSION = '1.2';
+
 use strict;
 no strict 'refs';
 use warnings;
-use Encode qw(encode);
 
 use threads;
 use threads::shared;
@@ -12,23 +11,23 @@ if ($threads::VERSION > 1.32){
 }
 
 use Data::Dumper;
-
-use XML::Simple;
-use File::stat;
-
+use Encode qw(encode);
 use ExtUtils::Installed;
+use File::stat;
+use XML::Simple;
+
 use FusionInventory::Logger;
-use FusionInventory::Agent::Storage;
-use FusionInventory::Agent::XML::Query::SimpleMessage;
+use FusionInventory::Agent::AccountInfo;
 use FusionInventory::Agent::Network;
 use FusionInventory::Agent::SNMP;
+use FusionInventory::Agent::Storage;
+use FusionInventory::Agent::XML::Query::SimpleMessage;
 
 use FusionInventory::Agent::Task::SNMPQuery::Cisco;
 use FusionInventory::Agent::Task::SNMPQuery::Procurve;
 use FusionInventory::Agent::Task::SNMPQuery::ThreeCom;
 
-use FusionInventory::Agent::AccountInfo;
-
+our $VERSION = '1.2';
 my $maxIdx : shared = 0;
 
 $SIG{INT} = \&signals;
