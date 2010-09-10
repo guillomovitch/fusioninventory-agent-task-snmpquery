@@ -15,12 +15,12 @@ use Data::Dumper;
 use Encode qw(encode);
 use ExtUtils::Installed;
 use File::stat;
+use UNIVERSAL::require;
 use XML::Simple;
 
 use FusionInventory::Logger;
 use FusionInventory::Agent::AccountInfo;
 use FusionInventory::Agent::Transmitter;
-use FusionInventory::Agent::SNMP;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
 
@@ -63,7 +63,8 @@ sub main {
     my $logger = $self->{logger};
     $self->{logger}->debug("FusionInventory SNMPQuery module ".$VERSION);
 
-   if ( not eval { require Net::SNMP; 1 } ) {
+    FusionInventory::Agent::SNMP->require();
+    if ($@) {
       $self->{logger}->debug("Can't load Net::SNMP. Exiting...");
       exit(0);
    }
