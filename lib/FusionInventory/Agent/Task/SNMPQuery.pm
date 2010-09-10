@@ -38,7 +38,7 @@ sub main {
     my $self = {};
     bless $self;
 
-    my $storage = $self->{storage} = new FusionInventory::Agent::Storage({
+    my $storage = $self->{storage} = FusionInventory::Agent::Storage->new({
             target => {
                 vardir => $ARGV[0],
             }
@@ -49,7 +49,7 @@ sub main {
 
     my $config = $self->{config} = $data->{config};
     my $target = $self->{target} = $data->{target};
-    my $logger = $self->{logger} = new FusionInventory::Logger ({
+    my $logger = $self->{logger} = FusionInventory::Logger->new({
             config => $self->{config}
         });
     $self->{prologresp} = $data->{prologresp};
@@ -85,7 +85,7 @@ sub main {
         exit(0);
     }
 
-      $self->{inventory} = new FusionInventory::Agent::XML::Query::SimpleMessage ({
+      $self->{inventory} = FusionInventory::Agent::XML::Query::SimpleMessage->new({
 
           # TODO, check if the accoun{info,config} are needed in localmode
 #          accountinfo => $accountinfo,
@@ -242,7 +242,7 @@ sub StartThreads {
 	#============================================
    my $max_procs = $nb_core_query*$nb_threads_query;
    if ($nb_core_query > 1) {
-      $pm=new Parallel::ForkManager($max_procs);
+      $pm = Parallel::ForkManager->new($max_procs);
    }
 
    if ($countnb[0] <  $nb_threads_query) {
@@ -347,7 +347,7 @@ sub StartThreads {
          sleep 1;
       }
 
-      my $transmitter = $self->{transmitter} = new FusionInventory::Agent::Transmitter ({
+      my $transmitter = $self->{transmitter} = FusionInventory::Agent::Transmitter->new({
             logger         => $self->{logger},
             url            => $self->{target}->{path},
             proxy          => $self->{config}->{proxy},
@@ -441,7 +441,7 @@ sub StartThreads {
 sub sendEndToServer() {
    my ($self) = @_;
 
-   my $transmitter = $self->{transmitter} = new FusionInventory::Agent::Transmitter ({
+   my $transmitter = $self->{transmitter} = FusionInventory::Agent::Transmitter->new({
         logger         => $self->{logger},
         url            => $self->{target}->{path},
         proxy          => $self->{config}->{proxy},
@@ -593,7 +593,7 @@ sub query_device_threaded {
 
 	#threads->yield;
 	############### SNMP Queries ###############
-   my $session = new FusionInventory::Agent::SNMP ({
+   my $session = FusionInventory::Agent::SNMP->new ({
 
                version      => $params->{authlist}->{VERSION},
                hostname     => $params->{device}->{IP},
@@ -609,7 +609,7 @@ sub query_device_threaded {
 	if (!defined($session->{SNMPSession}->{session})) {
 		return $datadevice;
 	}
-   my $session2 = new FusionInventory::Agent::SNMP ({
+   my $session2 = FusionInventory::Agent::SNMP->new({
 
                version      => $params->{authlist}->{VERSION},
                hostname     => $params->{device}->{IP},
@@ -687,7 +687,7 @@ sub query_device_threaded {
                $vlan_id_short =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
                $vlan_id_short =~ s/^.//;
                 #Initiate SNMP connection on this VLAN
-               my $session = new FusionInventory::Agent::SNMP ({
+               my $session = FusionInventory::Agent::SNMP->new({
 
                               version      => $params->{authlist}->{VERSION},
                               hostname     => $params->{device}->{IP},
@@ -700,7 +700,7 @@ sub query_device_threaded {
                               translate    => 1,
 
                            });
-                  my $session2 = new FusionInventory::Agent::SNMP ({
+                  my $session2 = FusionInventory::Agent::SNMP->new({
 
                               version      => $params->{authlist}->{VERSION},
                               hostname     => $params->{device}->{IP},
