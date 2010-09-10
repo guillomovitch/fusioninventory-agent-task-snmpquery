@@ -3,6 +3,7 @@ package FusionInventory::Agent::Task::SNMPQuery;
 use strict;
 no strict 'refs';
 use warnings;
+use base 'FusionInventory::Agent::Task';
 
 use threads;
 use threads::shared;
@@ -30,13 +31,23 @@ use FusionInventory::Agent::Task::SNMPQuery::ThreeCom;
 our $VERSION = '1.2';
 my $maxIdx : shared = 0;
 
-$SIG{INT} = \&signals;
+sub new {
+    my ($class) = @_;
+    my $self = $class->SUPER::new();
+
+    $SIG{INT} = sub {
+        warn "detection anormal end of runing program, will close it.\n";
+
+        $self->main('finish');
+        exit();
+    };
+
+    return $self;
+}
+
 
 sub main {
-    my ( $action ) = @_;
-
-    my $self = {};
-    bless $self;
+    my ($self, $action) = @_;
 
     my $storage = $self->{storage} = FusionInventory::Agent::Storage->new({
             target => {
@@ -1106,15 +1117,5 @@ sub HexaToString {
    }
    return $val;
 }
-
-
-sub signals {
-    $SIG{INT} = \&signals;
-    warn "detection anormal end of runing program, will close it.\n";
-
-    main('finish');
-    exit();
-}
-
 
 1;
