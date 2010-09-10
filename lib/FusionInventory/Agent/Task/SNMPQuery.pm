@@ -17,11 +17,9 @@ use XML::Simple;
 use File::stat;
 
 use ExtUtils::Installed;
-use FusionInventory::Agent::Config;
 use FusionInventory::Logger;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
-use FusionInventory::Agent::XML::Response::Prolog;
 use FusionInventory::Agent::Network;
 use FusionInventory::Agent::SNMP;
 
