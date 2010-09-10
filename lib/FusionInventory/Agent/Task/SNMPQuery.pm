@@ -85,7 +85,7 @@ sub main {
             }
         }
     }
-    if ($continue eq "0") {
+    if ($continue == 0) {
         $logger->debug("No SNMPQuery. Exiting...");
         return;
     }
@@ -172,7 +172,7 @@ sub StartThreads {
     $core_counter = 0;
     if (defined($self->{SNMPQUERY}->{DEVICE})) {
         if (ref($self->{SNMPQUERY}->{DEVICE}) eq "HASH"){
-            #if (keys (%{$data->{DEVICE}}) eq "0") {
+            #if (keys (%{$data->{DEVICE}}) == 0) {
             for (@devicetype) {
                 if ($self->{SNMPQUERY}->{DEVICE}->{TYPE} eq $_) {
                     if (ref($self->{SNMPQUERY}->{DEVICE}) eq "HASH"){
@@ -313,12 +313,12 @@ sub StartThreads {
 
                     $self->{logger}->debug("Core $p - Thread $t created");
 
-                    while ($loopthread ne "1") {
+                    while ($loopthread != 1) {
                         # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
                         $device_id = "";
                         {
                             lock(%devicelist2);
-                            if (keys %{$devicelist2{$p}} ne "0") {
+                            if (keys %{$devicelist2{$p}} != 0) {
                                 my @keys = sort keys %{$devicelist2{$p}};
                                 $device_id = pop @keys;
                                 delete $devicelist2{$p}{$device_id};
@@ -326,7 +326,7 @@ sub StartThreads {
                                 $loopthread = 1;
                             }
                         }
-                        if ($loopthread ne "1") {
+                        if ($loopthread != 1) {
                             my $datadevice = $self->query_device_threaded({
                                     device              => $devicelist->{$device_id},
                                     modellist           => $modelslist->{$devicelist->{$device_id}->{MODELSNMP_ID}},
@@ -336,7 +336,7 @@ sub StartThreads {
                             $xml_thread->{MODULEVERSION} = $VERSION;
                             $xml_thread->{PROCESSNUMBER} = $self->{SNMPQUERY}->{PARAM}->[0]->{PID};
                             $count++;
-                            if (($count eq "1") || (($loopthread eq "1") && ($count > 0))) {
+                            if (($count == 1) || (($loopthread == 1) && ($count > 0))) {
                                 $maxIdx++;
                                 $storage->save({
                                         idx =>
@@ -381,11 +381,11 @@ sub StartThreads {
 
 
         my $exit = 0;
-        while($exit eq "0") {
+        while($exit == 0) {
             sleep 2;
             my $count = 0;
             for(my $i = 0 ; $i < $nb_threads_query ; $i++) {
-                if ($TuerThread{$p}[$i] eq "1") {
+                if ($TuerThread{$p}[$i] == 1) {
                     $count++;
                 }
                 if ( $count eq $nb_threads_query ) {
@@ -649,7 +649,7 @@ sub query_device_threaded {
             $params = cartridgesupport($params);
         }
         for $key ( keys %{$params->{modellist}->{GET}} ) {
-            if ($params->{modellist}->{GET}->{$key}->{VLAN} eq "0") {
+            if ($params->{modellist}->{GET}->{$key}->{VLAN} == 0) {
                 my $oid_result = $session->snmpGet({
                         oid => $params->{modellist}->{GET}->{$key}->{OID},
                         up  => 1,
@@ -675,7 +675,7 @@ sub query_device_threaded {
                 });
             $HashDataSNMP->{$key} = $ArraySNMPwalk;
             if (exists($params->{modellist}->{WALK}->{$key}->{VLAN})) {
-                if ($params->{modellist}->{WALK}->{$key}->{VLAN} eq "1") {
+                if ($params->{modellist}->{WALK}->{$key}->{VLAN} == 1) {
                     $vlan_query = 1;
                 }
             }
@@ -687,7 +687,7 @@ sub query_device_threaded {
         if ($datadevice->{INFO}->{TYPE} eq "NETWORKING") {
             # Scan for each vlan (for specific switch manufacturer && model)
             # Implique de recrÃ©er une session spÃ©cialement pour chaque vlan : communautÃ©@vlanID
-            if ($vlan_query eq "1") {
+            if ($vlan_query == 1) {
                 while ( (my $vlan_id,my $vlan_name) = each (%{$HashDataSNMP->{'vtpVlanName'}}) ) {
                     my $vlan_id_short = $vlan_id;
                     $vlan_id_short =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
@@ -723,7 +723,7 @@ sub query_device_threaded {
                     $ArraySNMPwalk = {};
                     #$HashDataSNMP  = {};
                     for my $link ( keys %{$params->{modellist}->{WALK}} ) {
-                        if ($params->{modellist}->{WALK}->{$link}->{VLAN} eq "1") {
+                        if ($params->{modellist}->{WALK}->{$link}->{VLAN} == 1) {
                             $ArraySNMPwalk = $session->snmpWalk({
                                     oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
                                 });
