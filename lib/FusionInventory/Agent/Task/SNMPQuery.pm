@@ -18,7 +18,7 @@ use XML::Simple;
 
 use FusionInventory::Logger;
 use FusionInventory::Agent::AccountInfo;
-use FusionInventory::Agent::Network;
+use FusionInventory::Agent::Transmitter;
 use FusionInventory::Agent::SNMP;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
@@ -347,13 +347,16 @@ sub StartThreads {
          sleep 1;
       }
 
-      my $network = $self->{network} = new FusionInventory::Agent::Network ({
-
-               logger => $self->{logger},
-               config => $self->{config},
-               target => $self->{target},
-
-           });
+      my $transmitter = $self->{transmitter} = new FusionInventory::Agent::Transmitter ({
+            logger         => $self->{logger},
+            url            => $self->{target}->{path},
+            proxy          => $self->{config}->{proxy},
+            user           => $self->{config}->{user},
+            password       => $self->{config}->{password},
+            'no-ssl-check' => $self->{config}->{'no-ssl-check'},
+            'ca-cert-file' => $self->{config}->{'ca-cert-file'},
+            'ca-cert-dir'  => $self->{config}->{'ca-cert-dir'},
+    });
       push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
 
       # Send infos to server :
@@ -438,12 +441,15 @@ sub StartThreads {
 sub sendEndToServer() {
    my ($self) = @_;
 
-   my $network = $self->{network} = new FusionInventory::Agent::Network ({
-
-            logger => $self->{logger},
-            config => $self->{config},
-            target => $self->{target},
-
+   my $transmitter = $self->{transmitter} = new FusionInventory::Agent::Transmitter ({
+        logger         => $self->{logger},
+        url            => $self->{target}->{path},
+        proxy          => $self->{config}->{proxy},
+        user           => $self->{config}->{user},
+        password       => $self->{config}->{password},
+        'no-ssl-check' => $self->{config}->{'no-ssl-check'},
+        'ca-cert-file' => $self->{config}->{'ca-cert-file'},
+        'ca-cert-dir'  => $self->{config}->{'ca-cert-dir'},
         });
    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
 
@@ -479,7 +485,7 @@ sub SendInformations{
                    CONTENT   => $message->{data},
                },
            });
-    $self->{network}->send({message => $xmlMsg});
+    $self->{transmitter}->send({message => $xmlMsg});
    }
 }
 
