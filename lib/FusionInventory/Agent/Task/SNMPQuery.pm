@@ -58,12 +58,9 @@ sub main {
     my $data = $storage->restore({ module => "FusionInventory::Agent" });
     $self->{data} = $data;
 
-    my $config = $self->{config} = $data->{config};
-    my $target = $self->{target} = $data->{target};
-    my $logger = $self->{logger} = FusionInventory::Logger->new({
-            config => $self->{config}
-        });
-    $self->{prologresp} = $data->{prologresp};
+    my $config = $self->{config};
+    my $target = $self->{target};
+    my $logger = $self->{logger};
     $self->{logger}->debug("FusionInventory SNMPQuery module ".$VERSION);
 
    if ( not eval { require Net::SNMP; 1 } ) {
