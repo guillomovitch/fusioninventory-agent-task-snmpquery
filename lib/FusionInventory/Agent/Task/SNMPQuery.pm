@@ -14,6 +14,7 @@ if ($threads::VERSION > 1.32){
 use Data::Dumper;
 use Encode qw(encode);
 use ExtUtils::Installed;
+use English qw(-no_match_vars);
 use File::stat;
 use UNIVERSAL::require;
 use XML::Simple;
@@ -64,7 +65,7 @@ sub main {
     $self->{logger}->debug("FusionInventory SNMPQuery module ".$VERSION);
 
     FusionInventory::Agent::SNMP->require();
-    if ($@) {
+    if ($EVAL_ERROR) {
       $self->{logger}->debug("Can't load Net::SNMP. Exiting...");
       exit(0);
    }
@@ -130,7 +131,7 @@ sub StartThreads {
 	my $nb_core_query = $self->{SNMPQUERY}->{PARAM}->[0]->{CORE_QUERY};
 
     Parallel::ForkManager->require();
-   if ($@) {
+   if ($EVAL_ERROR) {
       if ($nb_core_query > 1) {
          $self->{logger}->debug("Parallel::ForkManager not installed, so only 1 core will be used...");
          $nb_core_query = 1;      
