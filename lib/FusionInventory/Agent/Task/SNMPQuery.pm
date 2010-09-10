@@ -88,9 +88,6 @@ sub main {
     $self->{PID} = $yday.$hour.$min;
 
     $self->{inventory} = FusionInventory::Agent::XML::Query::SimpleMessage->new({
-        # TODO, check if the accoun{info,config} are needed in localmode
-#          accountinfo => $accountinfo,
-#          accountconfig => $accountinfo,
         target => $target,
         config => $config,
         logger => $logger,
@@ -464,8 +461,6 @@ sub sendEndToServer() {
     undef($xml_thread);
 }
 
-
-
 sub SendInformations{
     my ($self, $message) = @_;
 
@@ -488,8 +483,6 @@ sub SendInformations{
         $self->{transmitter}->send({message => $xmlMsg});
     }
 }
-
-
 
 sub AuthParser {
     #my ($self, $dataAuth) = @_;
@@ -520,8 +513,6 @@ sub AuthParser {
     }
     return $authlist;
 }
-
-
 
 sub ModelParser {
     my $dataModel = shift;
@@ -580,8 +571,6 @@ sub ModelParser {
     }
     return $modelslist;
 }
-
-
 
 sub query_device_threaded {
     my ($self, $params) = @_;
@@ -742,8 +731,6 @@ sub query_device_threaded {
     }
     return $datadevice;
 }
-
-
 
 sub ConstructDataDeviceSimple {
     my $HashDataSNMP = shift;
