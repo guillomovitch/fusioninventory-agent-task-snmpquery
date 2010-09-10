@@ -40,7 +40,7 @@ sub new {
         warn "detection anormal end of runing program, will close it.\n";
 
         $self->main('finish');
-        exit();
+        return;
     };
 
     return $self;
@@ -67,7 +67,7 @@ sub main {
     FusionInventory::Agent::SNMP->require();
     if ($EVAL_ERROR) {
         $self->{logger}->debug("Can't load Net::SNMP. Exiting...");
-        exit(0);
+        return;
     }
 
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -87,12 +87,12 @@ sub main {
     }
     if ($continue eq "0") {
         $logger->debug("No SNMPQuery. Exiting...");
-        exit(0);
+        return;
     }
 
     if ($target->{'type'} ne 'server') {
         $logger->debug("No server. Exiting...");
-        exit(0);
+        return;
     }
 
     $self->{inventory} = FusionInventory::Agent::XML::Query::SimpleMessage->new({
@@ -109,7 +109,7 @@ sub main {
     } else {
         $self->StartThreads();
     }
-    exit(0);
+    return;
 }
 
 
