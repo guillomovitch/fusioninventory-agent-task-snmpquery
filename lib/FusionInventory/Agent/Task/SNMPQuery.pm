@@ -46,7 +46,7 @@ sub new {
 }
 
 
-sub main {
+sub run {
     my ($self, $action) = @_;
 
     if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
