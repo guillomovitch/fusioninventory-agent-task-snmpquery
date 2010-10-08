@@ -434,7 +434,10 @@ sub SendInformations{
             CONTENT => $message->{data},
         },
     });
-    $self->{transmitter}->send({message => $xmlMsg});
+    $self->{transmitter}->send({
+        message => $xmlMsg,
+        url     => $target->getUrl()
+    });
 }
 
 sub AuthParser {
