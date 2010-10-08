@@ -77,12 +77,6 @@ sub run {
     $yday = sprintf("%04d", $yday);
     $self->{PID} = $yday.$hour.$min;
 
-    $self->{inventory} = FusionInventory::Agent::XML::Query::SimpleMessage->new({
-        target => $target,
-        config => $config,
-        logger => $logger,
-    });
-
     if (defined($action) && $action eq "finish") {
         $self->sendEndToServer();
     } else {
@@ -454,22 +448,16 @@ sub SendInformations{
 
     my $config = $self->{config};
 
-    if ($config->{stdout}) {
-        $self->{inventory}->printXML();
-    } elsif ($config->{local}) {
-        $self->{inventory}->writeXML();
-    } elsif ($config->{server}) {
-        my $xmlMsg = FusionInventory::Agent::XML::Query::SimpleMessage->new({
-            config => $self->{config},
-            logger => $self->{logger},
-            target => $self->{target},
-            msg    => {
-                QUERY => 'SNMPQUERY',
-                CONTENT   => $message->{data},
-            },
-        });
-        $self->{transmitter}->send({message => $xmlMsg});
-    }
+    my $xmlMsg = FusionInventory::Agent::XML::Query::SimpleMessage->new({
+        config => $self->{config},
+        logger => $self->{logger},
+        target => $self->{target},
+        msg    => {
+            QUERY => 'SNMPQUERY',
+            CONTENT   => $message->{data},
+        },
+    });
+    $self->{transmitter}->send({message => $xmlMsg});
 }
 
 sub AuthParser {
