@@ -91,14 +91,14 @@ sub StartThreads {
 
     my $storage = $self->{target}->getStorage();
 
-    my $nb_threads_query = $self->{SNMPQUERY}->{PARAM}->[0]->{THREADS_QUERY};
-    my $nb_core_query = $self->{SNMPQUERY}->{PARAM}->[0]->{CORE_QUERY};
+    my $options = $self->{prologresp}->getOptionsInfoByName('SNMPQUERY');
+    my $params  = $options->{PARAM}->[0];
 
     Parallel::ForkManager->require();
     if ($EVAL_ERROR) {
-        if ($nb_core_query > 1) {
+        if ($params->{CORE_QUERY} > 1) {
             $self->{logger}->debug("Parallel::ForkManager not installed, so only 1 core will be used...");
-            $nb_core_query = 1;      
+            $params->{CORE_QUERY} = 1;      
         }
     }
 
@@ -130,7 +130,7 @@ sub StartThreads {
     my @countnb;
     my $core_counter = 0;
 
-    for($core_counter = 0 ; $core_counter < $nb_core_query ; $core_counter++) {
+    for($core_counter = 0 ; $core_counter < $params->{CORE_QUERY} ; $core_counter++) {
         $countnb[$core_counter] = 0;
         $devicelist2{$core_counter} = &share({});
     }
@@ -142,7 +142,7 @@ sub StartThreads {
             for (@devicetype) {
                 if ($self->{SNMPQUERY}->{DEVICE}->{TYPE} eq $_) {
                     if (ref($self->{SNMPQUERY}->{DEVICE}) eq "HASH"){
-                        if ($core_counter eq $nb_core_query) {
+                        if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
                         $devicelist->{$core_counter}->{$countnb[$core_counter]} = {
@@ -157,7 +157,7 @@ sub StartThreads {
                         $core_counter++;
                     } else {
                         foreach $num (@{$self->{SNMPQUERY}->{DEVICE}->{$_}}) {
-                            if ($core_counter eq $nb_core_query) {
+                            if ($core_counter eq $params->{CORE_QUERY}) {
                                 $core_counter = 0;
                             }
                             #### MODIFIER
@@ -173,7 +173,7 @@ sub StartThreads {
             foreach $device (@{$self->{SNMPQUERY}->{DEVICE}}) {
                 if (defined($device)) {
                     if (ref($device) eq "HASH"){
-                        if ($core_counter eq $nb_core_query) {
+                        if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
                         #### MODIFIER
@@ -189,7 +189,7 @@ sub StartThreads {
                         $core_counter++;
                     } else {
                         foreach $num (@{$device}) {
-                            if ($core_counter eq $nb_core_query) {
+                            if ($core_counter eq $params->{CORE_QUERY}) {
                                 $core_counter = 0;
                             }
                             #### MODIFIER
@@ -215,20 +215,20 @@ sub StartThreads {
     #============================================
     # Begin ForkManager (multiple core / process)
     #============================================
-    my $max_procs = $nb_core_query*$nb_threads_query;
-    if ($nb_core_query > 1) {
+    my $max_procs = $params->{CORE_QUERY}*$params->{THREADS_QUERY};
+    if ($params->{CORE_QUERY} > 1) {
         $pm = Parallel::ForkManager->new($max_procs);
     }
 
-    if ($countnb[0] <  $nb_threads_query) {
-        $nb_threads_query = $countnb[0];
+    if ($countnb[0] <  $params->{THREADS_QUERY}) {
+        $params->{THREADS_QUERY} = $countnb[0];
     }
 
     my $xml_Thread : shared = '';
     my %xml_out : shared;
     my $sendXML :shared = 0;
-    for(my $p = 0; $p < $nb_core_query; $p++) {
-        if ($nb_core_query > 1) {
+    for(my $p = 0; $p < $params->{CORE_QUERY}; $p++) {
+        if ($params->{CORE_QUERY} > 1) {
             my $pid = $pm->start and next;
         }
 #      write_pid();
@@ -237,7 +237,7 @@ sub StartThreads {
         my $sendbylwp : shared;
 
 # 0 : thread is alive, 1 : thread is dead 
-        for(my $j = 0 ; $j < $nb_threads_query ; $j++) {
+        for(my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
             $TuerThread{$p}[$j]    = 0;
         }
         #==================================
@@ -250,7 +250,7 @@ sub StartThreads {
 
         my $i = 0;
         my $Bin;
-        while ($i < $nb_threads_query) {
+        while ($i < $params->{THREADS_QUERY}) {
             $ArgumentsThread{'Bin'}[$p][$i] = $Bin;
             $ArgumentsThread{'log'}[$p][$i] = $log;
             $ArgumentsThread{'PID'}[$p][$i] = $self->{PID};
@@ -259,7 +259,7 @@ sub StartThreads {
         #===================================
         # Create all Threads
         #===================================
-        for(my $j = 0; $j < $nb_threads_query; $j++) {
+        for(my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
             $Thread[$p][$j] = threads->create( sub {
                     my $p = shift;
                     my $t = shift;
@@ -339,11 +339,11 @@ sub StartThreads {
         while($exit == 0) {
             sleep 2;
             my $count = 0;
-            for(my $i = 0 ; $i < $nb_threads_query ; $i++) {
+            for(my $i = 0 ; $i < $params->{THREADS_QUERY} ; $i++) {
                 if ($TuerThread{$p}[$i] == 1) {
                     $count++;
                 }
-                if ( $count eq $nb_threads_query ) {
+                if ( $count eq $params->{THREADS_QUERY} ) {
                     $exit = 1;
                 }
             }
@@ -365,11 +365,11 @@ sub StartThreads {
             }
         }
 
-        if ($nb_core_query > 1) {
+        if ($params->{CORE_QUERY} > 1) {
             $pm->finish;
         }
     }
-    if ($nb_core_query > 1) {
+    if ($params->{CORE_QUERY} > 1) {
         $pm->wait_all_children;
     }
 
