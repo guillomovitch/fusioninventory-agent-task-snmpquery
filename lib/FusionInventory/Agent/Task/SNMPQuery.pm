@@ -426,15 +426,12 @@ sub sendEndToServer() {
 sub SendInformations{
     my ($self, $message) = @_;
 
-    my $config = $self->{config};
-
     my $xmlMsg = FusionInventory::Agent::XML::Query::SimpleMessage->new({
-        config => $self->{config},
-        logger => $self->{logger},
-        target => $self->{target},
+        logger   => $self->{logger},
+        deviceid => $self->{deviceid},
         msg    => {
-            QUERY => 'SNMPQUERY',
-            CONTENT   => $message->{data},
+            QUERY   => 'SNMPQUERY',
+            CONTENT => $message->{data},
         },
     });
     $self->{transmitter}->send({message => $xmlMsg});
