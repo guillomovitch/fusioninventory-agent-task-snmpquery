@@ -60,15 +60,6 @@ sub run {
         return;
     }
 
-    my $storage = $self->{storage} = FusionInventory::Agent::Storage->new({
-        target => {
-            vardir => $ARGV[0],
-        }
-    });
-
-    my $data = $storage->restore({ module => "FusionInventory::Agent" });
-    $self->{data} = $data;
-
     my $config = $self->{config};
     my $target = $self->{target};
     my $logger = $self->{logger};
@@ -110,8 +101,7 @@ sub StartThreads {
     my $num;
     my $log;
 
-    my $storage = $self->{storage};
-
+    my $storage = $self->{target}->getStorage();
 
     my $nb_threads_query = $self->{SNMPQUERY}->{PARAM}->[0]->{THREADS_QUERY};
     my $nb_core_query = $self->{SNMPQUERY}->{PARAM}->[0]->{CORE_QUERY};
@@ -327,10 +317,9 @@ sub StartThreads {
                             if (($count == 1) || (($loopthread == 1) && ($count > 0))) {
                                 $maxIdx++;
                                 $storage->save({
-                                        idx =>
-                                        $maxIdx,
-                                        data => $xml_thread
-                                    });
+                                    idx => $maxIdx,
+                                    data => $xml_thread
+                                });
 
                                 $count = 0;
                             }
@@ -383,16 +372,16 @@ sub StartThreads {
             foreach my $idx (1..$maxIdx) {
                 if (!defined($sentxml->{$idx})) {
                     my $data = $storage->restore({
-                            idx => $idx
-                        });
+                        idx => $idx
+                    });
 
                     $self->SendInformations({
-                            data => $data
-                        });
+                        data => $data
+                    });
                     $sentxml->{$idx} = 1;
                     $storage->remove({
-                            idx => $idx
-                        });
+                        idx => $idx
+                    });
                     sleep 1;
                 }
             }
@@ -409,11 +398,11 @@ sub StartThreads {
     foreach my $idx (1..$maxIdx) {
         if (!defined($sentxml->{$idx})) {
             my $data = $storage->restore({
-                    idx => $idx
-                });
+                idx => $idx
+            });
             $self->SendInformations({
-                    data => $data
-                });
+                data => $data
+            });
             $sentxml->{$idx} = 1;
             sleep 1;
         }
