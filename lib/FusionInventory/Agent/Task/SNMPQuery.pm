@@ -327,16 +327,6 @@ sub StartThreads {
             sleep 1;
         }
 
-        my $transmitter = $self->{transmitter} = FusionInventory::Agent::Transmitter->new({
-                logger         => $self->{logger},
-                url            => $self->{target}->{path},
-                proxy          => $self->{config}->{proxy},
-                user           => $self->{config}->{user},
-                password       => $self->{config}->{password},
-                'no-ssl-check' => $self->{config}->{'no-ssl-check'},
-                'ca-cert-file' => $self->{config}->{'ca-cert-file'},
-                'ca-cert-dir'  => $self->{config}->{'ca-cert-dir'},
-            });
         push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
 
         # Send infos to server :
@@ -421,16 +411,6 @@ sub StartThreads {
 sub sendEndToServer() {
     my ($self) = @_;
 
-    my $transmitter = $self->{transmitter} = FusionInventory::Agent::Transmitter->new({
-        logger         => $self->{logger},
-        url            => $self->{target}->{path},
-        proxy          => $self->{config}->{proxy},
-        user           => $self->{config}->{user},
-        password       => $self->{config}->{password},
-        'no-ssl-check' => $self->{config}->{'no-ssl-check'},
-        'ca-cert-file' => $self->{config}->{'ca-cert-file'},
-        'ca-cert-dir'  => $self->{config}->{'ca-cert-dir'},
-    });
     push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
 
     # Send infos to server :
