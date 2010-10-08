@@ -38,7 +38,7 @@ sub new {
     $SIG{INT} = sub {
         warn "detection anormal end of runing program, will close it.\n";
 
-        $self->main('finish');
+        $self->sendEndToServer();
         return;
     };
 
@@ -47,7 +47,7 @@ sub new {
 
 
 sub run {
-    my ($self, $action) = @_;
+    my ($self) = @_;
 
     if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
         $self->{logger}->debug("No server. Exiting...");
@@ -77,11 +77,8 @@ sub run {
     $yday = sprintf("%04d", $yday);
     $self->{PID} = $yday.$hour.$min;
 
-    if (defined($action) && $action eq "finish") {
-        $self->sendEndToServer();
-    } else {
-        $self->StartThreads();
-    }
+    $self->StartThreads();
+
     return;
 }
 
