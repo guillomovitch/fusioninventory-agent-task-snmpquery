@@ -57,10 +57,13 @@ sub CDPLLDPPorts {
                 (hex $ip_num[9]);
             if (($ip ne "0.0.0.0") && ($ip =~ /^([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])$/)){
                 $port_number[$array[1]] = 1;
-                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
-                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
-                if (defined($data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number})) {
-                    $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number};
+                my $port = $device->{PORTS}->{PORT}->[$index->{$array[1]}];
+                $port->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
+                $port->{CONNECTIONS}->{CDP} = 1;
+                my $key = $walk->{cdpCacheDevicePort}->{OID} . $short_number;
+                if (defined $data->{cdpCacheDevicePort}->{$key}) {
+                    $port->{CONNECTIONS}->{CONNECTION}->{IFDESCR} =
+                        $data->{cdpCacheDevicePort}->{$key};
                 }
             }
             delete $data->{cdpCacheAddress}->{$number};
