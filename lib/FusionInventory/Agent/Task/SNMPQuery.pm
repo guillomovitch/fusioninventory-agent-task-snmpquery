@@ -909,33 +909,34 @@ sub constructDataDeviceMultiple {
 }
 
 sub putSimpleOid {
-    my ($HashDataSNMP, $datadevice, $element, $xmlelement1, $xmlelement2) = @_;
+    my ($data, $device, $element, $xmlelement1, $xmlelement2) = @_;
 
-    return unless exists $HashDataSNMP->{$element};
+    return unless exists $data->{$element};
     
     SWITCH: {
         if ($element eq "name" || $element eq "otherserial") {
             # Rewrite hexa to string
-            $HashDataSNMP->{$element} = hexaToString($HashDataSNMP->{$element});
+            $data->{$element} = hexaToString($data->{$element});
             last SWITCH;
         }
 
         if ($element eq "ram" || $element eq "memory") {
             # End rewrite hexa to string
-            $HashDataSNMP->{$element} = int(( $HashDataSNMP->{$element} / 1024 ) / 1024);
+            $data->{$element} = int(( $data->{$element} / 1024 ) / 1024);
             last SWITCH;
         }
 
         if ($element eq "serial") {
-            $HashDataSNMP->{$element} =~ s/^\s+//;
-            $HashDataSNMP->{$element} =~ s/\s+$//;
-            $HashDataSNMP->{$element} =~ s/(\.{2,})*//g;
+            $data->{$element} =~ s/^\s+//;
+            $data->{$element} =~ s/\s+$//;
+            $data->{$element} =~ s/(\.{2,})*//g;
             last SWITCH;
         }
 
         if ($element eq "firmware1") {
-            $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{"firmware1"}." ".$HashDataSNMP->{"firmware2"};
-            delete $HashDataSNMP->{"firmware2"};
+            $device->{$xmlelement1}->{$xmlelement2} = 
+                $data->{firmware1} . " " . $data->{firmware2};
+            delete $data->{firmware2};
             last SWITCH;
         }
         
@@ -946,36 +947,43 @@ sub putSimpleOid {
             $element =~ /^cartridge/     ||
             $element =~ /^drum/
         ) {
-            if ($HashDataSNMP->{$element."-level"} eq "-3") {
-                $datadevice->{$xmlelement1}->{$xmlelement2} = 100;
+            if ($data->{$element."-level"} eq "-3") {
+                $device->{$xmlelement1}->{$xmlelement2} = 100;
             } else {
-                putPercentOid($HashDataSNMP,$datadevice,$element."-capacitytype",$element."-level", $xmlelement1, $xmlelement2);
+                putPercentOid(
+                    $data,
+                    $device,
+                    $element . "-capacitytype",
+                    $element . "-level",
+                    $xmlelement1,
+                    $xmlelement2
+                );
             }
             last SWITCH;
         }
 
         # default
-        $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element};
+        $device->{$xmlelement1}->{$xmlelement2} = $data->{$element};
     }
 
-    delete $HashDataSNMP->{$element};
+    delete $data->{$element};
 }
 
 sub putPercentOid {
-    my ($HashDataSNMP, $datadevice, $element1, $element2, $xmlelement1, $xmlelement2) = @_;
+    my ($data, $device, $element1, $element2, $xmlelement1, $xmlelement2) = @_;
 
-    return unless exists $HashDataSNMP->{$element1};
+    return unless exists $data->{$element1};
 
     return unless
-        isInteger($HashDataSNMP->{$element2}) &&
-        isInteger($HashDataSNMP->{$element1}) &&
-        $HashDataSNMP->{$element1} ne '0';
+        isInteger($data->{$element2}) &&
+        isInteger($data->{$element1}) &&
+        $data->{$element1} ne '0';
 
-    $datadevice->{$xmlelement1}->{$xmlelement2} =
-        int ((100 * $HashDataSNMP->{$element2}) / $HashDataSNMP->{$element1});
+    $device->{$xmlelement1}->{$xmlelement2} =
+        int ((100 * $data->{$element2}) / $data->{$element1});
 
-    delete $HashDataSNMP->{$element2};
-    delete $HashDataSNMP->{$element1};
+    delete $data->{$element2};
+    delete $data->{$element1};
 }
 
 
