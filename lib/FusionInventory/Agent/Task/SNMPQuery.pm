@@ -913,31 +913,33 @@ sub putSimpleOid {
 
     return unless exists $data->{$element};
     
-    SWITCH: {
+    NORMALISATION: {
         if ($element eq "name" || $element eq "otherserial") {
             # Rewrite hexa to string
             $data->{$element} = hexaToString($data->{$element});
-            last SWITCH;
+            last NORMALISATION;
         }
 
         if ($element eq "ram" || $element eq "memory") {
             # End rewrite hexa to string
             $data->{$element} = int(( $data->{$element} / 1024 ) / 1024);
-            last SWITCH;
+            last NORMALISATION;
         }
 
         if ($element eq "serial") {
             $data->{$element} =~ s/^\s+//;
             $data->{$element} =~ s/\s+$//;
             $data->{$element} =~ s/(\.{2,})*//g;
-            last SWITCH;
+            last NORMALISATION;
         }
+    }
 
+    AFFECTATION: {
         if ($element eq "firmware1") {
             $device->{$xmlelement1}->{$xmlelement2} = 
                 $data->{firmware1} . " " . $data->{firmware2};
             delete $data->{firmware2};
-            last SWITCH;
+            last AFFECTATION;
         }
         
         if (
@@ -959,7 +961,7 @@ sub putSimpleOid {
                     $xmlelement2
                 );
             }
-            last SWITCH;
+            last AFFECTATION;
         }
 
         # default
