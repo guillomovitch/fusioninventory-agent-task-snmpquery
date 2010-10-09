@@ -944,10 +944,10 @@ sub putSimpleOid {
         }
         
         if (
-            $element =~ /^toner/ ||
-            $element eq "wastetoner" ||
-            $element =~ /^cartridge/ ||
+            $element eq "wastetoner"     ||
             $element eq "maintenancekit" ||
+            $element =~ /^toner/         ||
+            $element =~ /^cartridge/     ||
             $element =~ /^drum/
         ) {
             if ($HashDataSNMP->{$element."-level"} eq "-3") {
