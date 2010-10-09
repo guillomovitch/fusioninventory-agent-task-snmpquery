@@ -8,6 +8,7 @@ sub GetMAC {
 
     # each VLAN WALK per port
     while (my ($number, $ifphysaddress) = each %{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) {
+        next unless $ifphysaddress;
 
         my $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
@@ -26,7 +27,6 @@ sub GetMAC {
                 $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
             };
             if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
-                next unless $ifphysaddress;
                 next if $ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC};
 
                 my $i;
