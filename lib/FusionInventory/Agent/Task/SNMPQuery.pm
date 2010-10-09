@@ -583,7 +583,7 @@ sub query_device_threaded {
         $datadevice->{INFO}->{ID} = $params->{device}->{ID};
         $datadevice->{INFO}->{TYPE} = $params->{device}->{TYPE};
         # Conversion
-        constructDataDeviceSimple($HashDataSNMP,$datadevice);
+        constructDataDeviceSimple($HashDataSNMP, $datadevice);
 
         # Query SNMP walk #
         my $vlan_query = 0;
@@ -600,7 +600,13 @@ sub query_device_threaded {
         }
 
         # Conversion
-        constructDataDeviceMultiple($HashDataSNMP,$datadevice, $self, $params->{modellist}->{WALK}->{vtpVlanName}->{OID}, $params->{modellist}->{WALK});
+        constructDataDeviceMultiple(
+            $HashDataSNMP,
+            $datadevice,
+            $self,
+            $params->{modellist}->{WALK}->{vtpVlanName}->{OID},
+            $params->{modellist}->{WALK}
+        );
 
         if ($datadevice->{INFO}->{TYPE} eq "NETWORKING") {
             # Scan for each vlan (for specific switch manufacturer && model)
