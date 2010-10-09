@@ -942,11 +942,7 @@ sub constructDataDeviceMultiple {
 }
 
 sub putSimpleOid {
-    my $HashDataSNMP = shift;
-    my $datadevice = shift;
-    my $element = shift;
-    my $xmlelement1 = shift;
-    my $xmlelement2 = shift;
+    my ($HashDataSNMP, $datadevice, $element, $xmlelement1, $xmlelement2) = @_;
 
     return unless exists $HashDataSNMP->{$element};
     
@@ -999,12 +995,7 @@ sub putSimpleOid {
 }
 
 sub putPercentOid {
-    my $HashDataSNMP = shift;
-    my $datadevice = shift;
-    my $element1 = shift;
-    my $element2 = shift;
-    my $xmlelement1 = shift;
-    my $xmlelement2 = shift;
+    my ($HashDataSNMP, $datadevice, $element1, $element2, $xmlelement1, $xmlelement2) = @_;
 
     return unless exists $HashDataSNMP->{$element1};
 
