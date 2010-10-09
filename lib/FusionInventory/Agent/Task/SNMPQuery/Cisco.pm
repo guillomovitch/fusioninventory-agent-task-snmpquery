@@ -40,8 +40,6 @@ sub GetMAC {
             $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
             $i++;
         }
-#      delete $data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}->{$number};
-#      delete $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
     }
 }
 
