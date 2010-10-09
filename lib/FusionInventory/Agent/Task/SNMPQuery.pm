@@ -548,17 +548,6 @@ sub query_device_threaded {
     if (!defined($session->{SNMPSession}->{session})) {
         return $datadevice;
     }
-    my $session2 = FusionInventory::Agent::SNMP->new({
-        version      => $params->{authlist}->{VERSION},
-        hostname     => $params->{device}->{IP},
-        community    => $params->{authlist}->{COMMUNITY},
-        username     => $params->{authlist}->{USERNAME},
-        authpassword => $params->{authlist}->{AUTHPASSWORD},
-        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-        privpassword => $params->{authlist}->{PRIVPASSWORD},
-        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-        translate    => 0,
-    });
 
     my $error = '';
     # Query for timeout #
@@ -633,17 +622,6 @@ sub query_device_threaded {
                         privpassword => $params->{authlist}->{PRIVPASSWORD},
                         privprotocol => $params->{authlist}->{PRIVPROTOCOL},
                         translate    => 1,
-                    });
-                    my $session2 = FusionInventory::Agent::SNMP->new({
-                        version      => $params->{authlist}->{VERSION},
-                        hostname     => $params->{device}->{IP},
-                        community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
-                        username     => $params->{authlist}->{USERNAME},
-                        authpassword => $params->{authlist}->{AUTHPASSWORD},
-                        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-                        privpassword => $params->{authlist}->{PRIVPASSWORD},
-                        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-                        translate    => 0,
                     });
 
                     $ArraySNMPwalk = {};
