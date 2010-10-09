@@ -22,24 +22,17 @@ sub GetMAC {
                     $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                 };
                 if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
-                    my $add = 1;
-                    if ($ifphysaddress eq "") {
-                        $add = 0;
+                    next unless $ifphysaddress;
+                    next if $ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC};
+
+                    my $i;
+                    if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
+                        $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
+                    } else {
+                        $i = 0;
                     }
-                    if ($ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
-                        $add = 0;
-                    }
-                    if ($add == 1) {
-                        my $i;
-                        if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-                            $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
-                            #$i++;
-                        } else {
-                            $i = 0;
-                        }
-                        $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
-                        $i++;
-                    }
+                    $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
+                    $i++;
                 }
             }
         }
