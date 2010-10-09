@@ -147,6 +147,9 @@ sub run {
     $yday = sprintf("%04d", $yday);
     $self->{PID} = $yday.$hour.$min;
 
+    # what is this for ?
+    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16 * 1024);
+
     $self->startThreads();
 
     return;
@@ -394,8 +397,6 @@ sub startThreads {
             sleep 1;
         }
 
-        push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
-
         # Send infos to server :
         my $xml_thread = {};
         $xml_thread->{AGENT}->{START} = '1';
@@ -477,8 +478,6 @@ sub startThreads {
 
 sub sendEndToServer() {
     my ($self) = @_;
-
-    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
 
     my $options = $self->{prologresp}->getOptionsInfoByName('SNMPQUERY');
     my $params  = $options->{PARAM}->[0];
