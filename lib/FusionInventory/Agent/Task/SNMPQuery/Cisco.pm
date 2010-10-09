@@ -20,10 +20,7 @@ sub TrunkPorts {
 }
 
 sub CDPPorts {
-   my $data = shift,
-   my $device = shift;
-   my $oid_walks = shift;
-   my $index = shift;
+    my ($data, $device, $walk, $index) = @_;
 
    my $short_number;
 
@@ -31,15 +28,15 @@ sub CDPPorts {
       while ( my ( $number, $ip_hex) = each (%{$data->{cdpCacheAddress}}) ) {
          $ip_hex =~ s/://g;
          $short_number = $number;
-         $short_number =~ s/$oid_walks->{cdpCacheAddress}->{OID}//;
+         $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
          my @array = split(/\./, $short_number);
          my @ip_num = split(/(\S{2})/, $ip_hex);
          my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
          if ($ip ne "0.0.0.0") {
             $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
             $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
-            if (defined($data->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number})) {
-               $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number};
+            if (defined($data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number})) {
+               $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number};
             }
          }
          delete $data->{cdpCacheAddress}->{$number};
@@ -61,11 +58,7 @@ sub CDPPorts {
 
 
 sub GetMAC {
-   my $data = shift,
-   my $device = shift;
-   my $vlan_id = shift;
-   my $index = shift;
-   my $oid_walks = shift;
+    my ($data, $device, $vlan_id, $index, $walk) = @_;
 
    my $ifIndex;
    my $numberip;
@@ -77,16 +70,16 @@ sub GetMAC {
    # each VLAN WALK per port
    while ( my ($number,$ifphysaddress) = each (%{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) ) {
       $short_number = $number;
-      $short_number =~ s/$oid_walks->{dot1dTpFdbAddress}->{OID}//;
-      $dot1dTpFdbPort = $oid_walks->{dot1dTpFdbPort}->{OID};
+      $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
+      $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
       if (exists $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
          if (exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
-                              $oid_walks->{dot1dBasePortIfIndex}->{OID}.".".
+                              $walk->{dot1dBasePortIfIndex}->{OID}.".".
                               $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                            }) {
 
             $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
-                              $oid_walks->{dot1dBasePortIfIndex}->{OID}.".".
+                              $walk->{dot1dBasePortIfIndex}->{OID}.".".
                               $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                            };
             if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
