@@ -20,7 +20,7 @@ sub GetMAC {
         my $subkey = 
             $walk->{dot1dBasePortIfIndex}->{OID} . 
             "." .
-            $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$key}
+            $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$key};
 
         next unless
             exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{$subkey};
