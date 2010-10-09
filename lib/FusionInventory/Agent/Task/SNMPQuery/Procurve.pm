@@ -43,7 +43,7 @@ sub CDPLLDPPorts {
     my $short_number;
     my @port_number;
 
-    if (ref($data->{cdpCacheAddress}) eq "HASH"){
+    if (ref $data->{cdpCacheAddress} eq "HASH") {
         while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
             $short_number = $number;
             $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
@@ -74,7 +74,8 @@ sub CDPLLDPPorts {
             }
         }
     }
-    if (ref($data->{lldpCacheAddress}) eq "HASH"){
+
+    if (ref $data->{lldpCacheAddress} eq "HASH") {
         while (my ($number, $chassisname) = each %{$data->{lldpCacheAddress}}) {
             $short_number = $number;
             $short_number =~ s/$walk->{lldpCacheAddress}->{OID}//;
