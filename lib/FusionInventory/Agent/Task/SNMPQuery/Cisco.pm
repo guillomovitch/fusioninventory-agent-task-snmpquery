@@ -57,12 +57,10 @@ sub TrunkPorts {
 sub CDPPorts {
     my ($data, $device, $walk, $index) = @_;
 
-    my $short_number;
-
     if (ref($data->{cdpCacheAddress}) eq "HASH"){
         while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
             $ip_hex =~ s/://g;
-            $short_number = $number;
+            my $short_number = $number;
             $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
             my @array = split(/\./, $short_number);
             my @ip_num = split(/(\S{2})/, $ip_hex);
