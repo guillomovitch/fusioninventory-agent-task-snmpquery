@@ -71,10 +71,13 @@ sub CDPPorts {
             (hex $ip_num[7]) . "." .
             (hex $ip_num[9]);
         if ($ip ne "0.0.0.0") {
-            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
-            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
-            if (defined($data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number})) {
-                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number};
+            my $port = $device->{PORTS}->{PORT}->[$index->{$array[1]}];
+            $port->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
+            $port->{CONNECTIONS}->{CDP} = 1;
+            my $key = $walk->{cdpCacheDevicePort}->{OID} . $short_number;
+            if (defined $data->{cdpCacheDevicePort}->{$key}) {
+                $port->{CONNECTIONS}->{CONNECTION}->{IFDESCR} =
+                    $data->{cdpCacheDevicePort}->{$key};
             }
         }
         delete $data->{cdpCacheAddress}->{$number};
