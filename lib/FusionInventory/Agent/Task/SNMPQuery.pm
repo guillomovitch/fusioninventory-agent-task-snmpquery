@@ -516,27 +516,11 @@ sub getAuthList {
 
     if (ref($options->{AUTHENTICATION}) eq "HASH") {
         # a single auth object
-        $list->{$options->{AUTHENTICATION}->{ID}} = {
-            COMMUNITY    => $options->{AUTHENTICATION}->{COMMUNITY},
-            VERSION      => $options->{AUTHENTICATION}->{VERSION},
-            USERNAME     => $options->{AUTHENTICATION}->{USERNAME},
-            AUTHPASSWORD => $options->{AUTHENTICATION}->{AUTHPASSPHRASE},
-            AUTHPROTOCOL => $options->{AUTHENTICATION}->{AUTHPROTOCOL},
-            PRIVPASSWORD => $options->{AUTHENTICATION}->{PRIVPASSPHRASE},
-            PRIVPROTOCOL => $options->{AUTHENTICATION}->{PRIVPROTOCOL}
-        };
+        $list->{$options->{AUTHENTICATION}->{ID}} = $options->{AUTHENTICATION};
     } else {
         # a list of auth objects
         foreach my $auth (@{$options->{AUTHENTICATION}}) {
-            $list->{$auth->{ID}} = {
-                COMMUNITY    => $auth->{COMMUNITY},
-                VERSION      => $auth->{VERSION},
-                USERNAME     => $auth->{USERNAME},
-                AUTHPASSWORD => $auth->{AUTHPASSPHRASE},
-                AUTHPROTOCOL => $auth->{AUTHPROTOCOL},
-                PRIVPASSWORD => $auth->{PRIVPASSPHRASE},
-                PRIVPROTOCOL => $auth->{PRIVPROTOCOL}
-            };
+            $list->{$auth->{ID}} = $auth;
         }
     }
 
@@ -586,9 +570,9 @@ sub query_device_threaded {
         hostname     => $params->{device}->{IP},
         community    => $params->{authlist}->{COMMUNITY},
         username     => $params->{authlist}->{USERNAME},
-        authpassword => $params->{authlist}->{AUTHPASSWORD},
+        authpassword => $params->{authlist}->{AUTHPASSPHRASE},
         authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-        privpassword => $params->{authlist}->{PRIVPASSWORD},
+        privpassword => $params->{authlist}->{PRIVPASSPHRASE},
         privprotocol => $params->{authlist}->{PRIVPROTOCOL},
         translate    => 1,
     });
