@@ -65,7 +65,11 @@ sub CDPPorts {
         $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
         my @array = split(/\./, $short_number);
         my @ip_num = split(/(\S{2})/, $ip_hex);
-        my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
+        my $ip =
+            (hex $ip_num[3]) . "." .
+            (hex $ip_num[5]) . "." .
+            (hex $ip_num[7]) . "." .
+            (hex $ip_num[9]);
         if ($ip ne "0.0.0.0") {
             $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
             $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
