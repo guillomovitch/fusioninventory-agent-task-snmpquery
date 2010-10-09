@@ -995,17 +995,25 @@ sub lastSplitObject {
 sub cartridgeSupport {
     my $params = shift;
 
-    for my $key ( keys %{$params->{modellist}->{GET}} ) {
-        if (($key =~ /^toner/) || ($key eq "wastetoner") || ($key =~ /^cartridge/) || ($key eq "maintenancekit") || ($key =~ /^drum/)) {
-            $params->{modellist}->{GET}->{$key."-capacitytype"}->{OID} = $params->{modellist}->{GET}->{$key}->{OID};
-            $params->{modellist}->{GET}->{$key."-capacitytype"}->{OID} =~ s/43.11.1.1.6/43.11.1.1.8/;
-            $params->{modellist}->{GET}->{$key."-capacitytype"}->{VLAN} = 0;
+    for my $key (keys %{$params->{modellist}->{GET}}) {
+        next unless
+            $key eq "wastetoner"     ||
+            $key eq "maintenancekit" ||
+            $key =~ /^toner/         ||
+            $key =~ /^cartridge/     ||
+            $key =~ /^drum/;
 
-            $params->{modellist}->{GET}->{$key."-level"}->{OID} = $params->{modellist}->{GET}->{$key}->{OID};
-            $params->{modellist}->{GET}->{$key."-level"}->{OID} =~ s/43.11.1.1.6/43.11.1.1.9/;
-            $params->{modellist}->{GET}->{$key."-level"}->{VLAN} = 0;
-        }
+        my $capacity = $params->{modellist}->{GET}->{$key."-capacitytype"};
+        $capacity->{OID} = $params->{modellist}->{GET}->{$key}->{OID};
+        $capacity->{OID} =~ s/43.11.1.1.6/43.11.1.1.8/;
+        $capacity->{VLAN} = 0;
+
+        my $level = $params->{modellist}->{GET}->{$key."-level"};
+        $level->{OID} = $params->{modellist}->{GET}->{$key}->{OID};
+        $level->{OID} =~ s/43.11.1.1.6/43.11.1.1.9/;
+        $level->{VLAN} = 0;
     }
+
     return $params;
 }
 
