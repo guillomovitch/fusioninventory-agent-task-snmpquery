@@ -549,26 +549,23 @@ sub query_device_threaded {
         return $datadevice;
     }
     my $session2 = FusionInventory::Agent::SNMP->new({
-
-            version      => $params->{authlist}->{VERSION},
-            hostname     => $params->{device}->{IP},
-            community    => $params->{authlist}->{COMMUNITY},
-            username     => $params->{authlist}->{USERNAME},
-            authpassword => $params->{authlist}->{AUTHPASSWORD},
-            authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-            privpassword => $params->{authlist}->{PRIVPASSWORD},
-            privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-            translate    => 0,
-
-        });
-
+        version      => $params->{authlist}->{VERSION},
+        hostname     => $params->{device}->{IP},
+        community    => $params->{authlist}->{COMMUNITY},
+        username     => $params->{authlist}->{USERNAME},
+        authpassword => $params->{authlist}->{AUTHPASSWORD},
+        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
+        privpassword => $params->{authlist}->{PRIVPASSWORD},
+        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
+        translate    => 0,
+    });
 
     my $error = '';
     # Query for timeout #
     my $description = $session->snmpGet({
-            oid => '.1.3.6.1.2.1.1.1.0',
-            up  => 1,
-        });
+        oid => '.1.3.6.1.2.1.1.1.0',
+        up  => 1,
+    });
     my $insertXML = '';
     if ($description =~ m/No response from remote host/) {
         $error = "No response from remote host";
@@ -627,31 +624,27 @@ sub query_device_threaded {
                     $vlan_id_short =~ s/^.//;
                     #Initiate SNMP connection on this VLAN
                     my $session = FusionInventory::Agent::SNMP->new({
-
-                            version      => $params->{authlist}->{VERSION},
-                            hostname     => $params->{device}->{IP},
-                            community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
-                            username     => $params->{authlist}->{USERNAME},
-                            authpassword => $params->{authlist}->{AUTHPASSWORD},
-                            authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-                            privpassword => $params->{authlist}->{PRIVPASSWORD},
-                            privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-                            translate    => 1,
-
-                        });
+                        version      => $params->{authlist}->{VERSION},
+                        hostname     => $params->{device}->{IP},
+                        community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
+                        username     => $params->{authlist}->{USERNAME},
+                        authpassword => $params->{authlist}->{AUTHPASSWORD},
+                        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
+                        privpassword => $params->{authlist}->{PRIVPASSWORD},
+                        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
+                        translate    => 1,
+                    });
                     my $session2 = FusionInventory::Agent::SNMP->new({
-
-                            version      => $params->{authlist}->{VERSION},
-                            hostname     => $params->{device}->{IP},
-                            community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
-                            username     => $params->{authlist}->{USERNAME},
-                            authpassword => $params->{authlist}->{AUTHPASSWORD},
-                            authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-                            privpassword => $params->{authlist}->{PRIVPASSWORD},
-                            privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-                            translate    => 0,
-
-                        });
+                        version      => $params->{authlist}->{VERSION},
+                        hostname     => $params->{device}->{IP},
+                        community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
+                        username     => $params->{authlist}->{USERNAME},
+                        authpassword => $params->{authlist}->{AUTHPASSWORD},
+                        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
+                        privpassword => $params->{authlist}->{PRIVPASSWORD},
+                        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
+                        translate    => 0,
+                    });
 
                     $ArraySNMPwalk = {};
                     #$HashDataSNMP  = {};
