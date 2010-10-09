@@ -13,14 +13,18 @@ sub GetMAC {
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
 
-        next unless exists $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
-        my $ifIndex = $data->{dot1dBasePortIfIndex}->{
-            $walk->{dot1dBasePortIfIndex}->{OID}.".".
-            $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
-        };
+        my $key = $dot1dTpFdbPort . $short_number;
+        next unless exists $data->{dot1dTpFdbPort}->{$key};
 
-        my $connection =
-            $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION};
+        my $subkey = 
+            $walk->{dot1dBasePortIfIndex}->{OID} . 
+            "." .
+            $data->{dot1dTpFdbPort}->{$key};
+
+        my $ifIndex = $data->{dot1dBasePortIfIndex}->{$subkey};
+
+        my $port = $device->{PORTS}->{PORT}->[$index->{$ifIndex}];
+        my $connection = $port->{CONNECTIONS}->{CONNECTION};
         my $i = $connection ? @{$connection} : 0;
         $connection->[$i]->{MAC} = $ifphysaddress;
     }
