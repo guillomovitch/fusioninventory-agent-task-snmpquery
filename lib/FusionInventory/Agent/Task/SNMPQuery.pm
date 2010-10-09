@@ -634,7 +634,7 @@ sub query_device_threaded {
         constructDataDeviceMultiple(
             $HashDataSNMP,
             $datadevice,
-            $self,
+            $self->{portsindex},
             $params->{modellist}->{WALK}->{vtpVlanName}->{OID},
             $params->{modellist}->{WALK}
         );
@@ -721,10 +721,9 @@ sub constructDataDeviceSimple {
 
 
 sub constructDataDeviceMultiple {
-    my ($data, $device, $self, $vtpVlanName_oid, $walkoid) = @_;
+    my ($data, $device, $index, $vtpVlanName_oid, $walkoid) = @_;
 
     my $port = $device->{PORTS}->{PORT};
-    my $index = $self->{portsindex};
 
     if (exists $data->{ipAdEntAddr}) {
         my $i = 0;
@@ -862,11 +861,11 @@ sub constructDataDeviceMultiple {
     # Detect Trunk & CDP
     if (defined ($device->{INFO}->{COMMENTS})) {
         if ($device->{INFO}->{COMMENTS} =~ /Cisco/) {
-            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
-            FusionInventory::Agent::Task::SNMPQuery::Cisco::CDPPorts($data, $device, $walkoid, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $index);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::CDPPorts($data, $device, $walkoid, $index);
         } elsif ($device->{INFO}->{COMMENTS} =~ /ProCurve/) {
-            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
-            FusionInventory::Agent::Task::SNMPQuery::Procurve::CDPLLDPPorts($data, $device, $walkoid, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $index);
+            FusionInventory::Agent::Task::SNMPQuery::Procurve::CDPLLDPPorts($data, $device, $walkoid, $index);
         }
     }
 

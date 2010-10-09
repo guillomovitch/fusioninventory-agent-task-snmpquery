@@ -5,7 +5,7 @@ use strict;
 sub GetMAC {
    my $HashDataSNMP = shift,
    my $datadevice = shift;
-   my $self = shift;
+   my $index = shift;
    my $oid_walks = shift;
 
    my $ifIndex;
@@ -30,22 +30,22 @@ sub GetMAC {
                               $oid_walks->{dot1dBasePortIfIndex}->{OID}.".".
                               $HashDataSNMP->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                            };
-            if (not exists $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
+            if (not exists $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
                my $add = 1;
                if ($ifphysaddress eq "") {
                   $add = 0;
                }
-               if ($ifphysaddress eq $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$ifIndex}]->{MAC}) {
+               if ($ifphysaddress eq $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
                   $add = 0;
                }
                if ($add eq "1") {
-                  if (exists $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-                     $i = @{$datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
+                  if (exists $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
+                     $i = @{$datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                      #$i++;
                   } else {
                      $i = 0;
                   }
-                  $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
+                  $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
                   $i++;
                }
             }
@@ -61,7 +61,7 @@ sub CDPLLDPPorts {
    my $HashDataSNMP = shift,
    my $datadevice = shift;
    my $oid_walks = shift;
-   my $self = shift;
+   my $index = shift;
 
    my $short_number;
    my @port_number;
@@ -76,10 +76,10 @@ sub CDPLLDPPorts {
          my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
          if (($ip ne "0.0.0.0") && ($ip =~ /^([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])$/)){
             $port_number[$array[1]] = 1;
-            $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
-            $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
+            $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
+            $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
             if (defined($HashDataSNMP->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number})) {
-               $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $HashDataSNMP->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number};
+               $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $HashDataSNMP->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number};
             }
          }
          delete $HashDataSNMP->{cdpCacheAddress}->{$number};
@@ -102,10 +102,10 @@ sub CDPLLDPPorts {
          $short_number =~ s/$oid_walks->{lldpCacheAddress}->{OID}//;
          my @array = split(/\./, $short_number);
          if (!defined($port_number[$array[1]])) {
-             $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{SYSNAME} = $chassisname;
-             $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
+             $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{SYSNAME} = $chassisname;
+             $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
              if (defined($HashDataSNMP->{lldpCacheDevicePort}->{$oid_walks->{lldpCacheDevicePort}->{OID}.$short_number})) {
-                $datadevice->{PORTS}->{PORT}->[$self->{portsindex}->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $HashDataSNMP->{lldpCacheDevicePort}->{$oid_walks->{lldpCacheDevicePort}->{OID}.$short_number};
+                $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $HashDataSNMP->{lldpCacheDevicePort}->{$oid_walks->{lldpCacheDevicePort}->{OID}.$short_number};
              }
 
              delete $HashDataSNMP->{lldpCacheAddress}->{$number};
