@@ -6,6 +6,7 @@ use base 'Exporter';
 
 our @EXPORT = qw(
     lastSplitObject
+    getStringIpAddress
 );
 
 sub lastSplitObject {
