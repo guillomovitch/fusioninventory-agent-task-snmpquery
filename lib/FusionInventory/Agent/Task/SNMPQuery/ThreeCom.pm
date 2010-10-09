@@ -23,7 +23,7 @@ sub GetMAC {
         if ($ifphysaddress eq "") {
             $add = 0;
         }
-        if (($add eq "1") && (exists($data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}))) {
+        if (($add == 1) && (exists($data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}))) {
             $ifIndex = $data->{dot1dBasePortIfIndex}->{
             $walk->{dot1dBasePortIfIndex}->{OID}.".".
             $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}

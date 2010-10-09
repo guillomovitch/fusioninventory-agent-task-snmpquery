@@ -36,7 +36,7 @@ sub GetMAC {
                     if ($ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
                         $add = 0;
                     }
-                    if ($add eq "1") {
+                    if ($add == 1) {
                         if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
                             $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                             #$i++;
@@ -58,14 +58,14 @@ sub TrunkPorts {
     my ($data, $device, $index) = @_;
 
     while ( (my $port_id, my $trunk) = each (%{$data->{vlanTrunkPortDynamicStatus}}) ) {
-        if ($trunk eq "1") {
+        if ($trunk == 1) {
             $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = $trunk;
         } else {
             $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = '0';
         }
         delete $data->{vlanTrunkPortDynamicStatus}->{$port_id};
     }
-    if (keys (%{$data->{vlanTrunkPortDynamicStatus}}) eq "0") {
+    if (keys (%{$data->{vlanTrunkPortDynamicStatus}}) == 0) {
         delete $data->{vlanTrunkPortDynamicStatus};
     }
 }
@@ -95,11 +95,11 @@ sub CDPPorts {
                 delete $data->{cdpCacheDevicePort}->{$number};
             }
         }
-        if (keys (%{$data->{cdpCacheAddress}}) eq "0") {
+        if (keys (%{$data->{cdpCacheAddress}}) == 0) {
             delete $data->{cdpCacheAddress};
         }
         if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
-            if (keys (%{$data->{cdpCacheDevicePort}}) eq "0") {
+            if (keys (%{$data->{cdpCacheDevicePort}}) == 0) {
                 delete $data->{cdpCacheDevicePort};
             }
         }

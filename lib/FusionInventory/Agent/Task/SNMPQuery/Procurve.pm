@@ -36,7 +36,7 @@ sub GetMAC {
                     if ($ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
                         $add = 0;
                     }
-                    if ($add eq "1") {
+                    if ($add == 1) {
                         if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
                             $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                             #$i++;
@@ -82,11 +82,11 @@ sub CDPLLDPPorts {
                 delete $data->{cdpCacheDevicePort}->{$number};
             }
         }
-        if (keys (%{$data->{cdpCacheAddress}}) eq "0") {
+        if (keys (%{$data->{cdpCacheAddress}}) == 0) {
             delete $data->{cdpCacheAddress};
         }
         if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
-            if (keys (%{$data->{cdpCacheDevicePort}}) eq "0") {
+            if (keys (%{$data->{cdpCacheDevicePort}}) == 0) {
                 delete $data->{cdpCacheDevicePort};
             }
         }
@@ -109,11 +109,11 @@ sub CDPLLDPPorts {
                 }
             }
         }
-        if (keys (%{$data->{lldpCacheAddress}}) eq "0") {
+        if (keys (%{$data->{lldpCacheAddress}}) == 0) {
             delete $data->{lldpCacheAddress};
         }
         if (ref($data->{lldpCacheDevicePort}) eq "HASH"){
-            if (keys (%{$data->{lldpCacheDevicePort}}) eq "0") {
+            if (keys (%{$data->{lldpCacheDevicePort}}) == 0) {
                 delete $data->{lldpCacheDevicePort};
             }
         }
