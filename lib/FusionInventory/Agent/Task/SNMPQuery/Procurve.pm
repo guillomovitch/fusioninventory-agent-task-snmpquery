@@ -14,7 +14,7 @@ sub GetMAC {
 
     my $i = 0;
 
-    while ( my ($number,$ifphysaddress) = each (%{$data->{dot1dTpFdbAddress}}) ) {
+    while (my ($number, $ifphysaddress) = each %{$data->{dot1dTpFdbAddress}}) {
         $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
@@ -62,7 +62,7 @@ sub CDPLLDPPorts {
     my @port_number;
 
     if (ref($data->{cdpCacheAddress}) eq "HASH"){
-        while ( my ( $number, $ip_hex) = each (%{$data->{cdpCacheAddress}}) ) {
+        while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
             $ip_hex =~ s/://g;
             $short_number = $number;
             $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
@@ -92,7 +92,7 @@ sub CDPLLDPPorts {
         }
     }
     if (ref($data->{lldpCacheAddress}) eq "HASH"){
-        while ( my ( $number, $chassisname) = each (%{$data->{lldpCacheAddress}}) ) {
+        while (my ($number, $chassisname) = each %{$data->{lldpCacheAddress}}) {
             $short_number = $number;
             $short_number =~ s/$walk->{lldpCacheAddress}->{OID}//;
             my @array = split(/\./, $short_number);

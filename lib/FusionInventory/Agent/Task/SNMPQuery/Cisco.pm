@@ -14,7 +14,7 @@ sub GetMAC {
 
     my $i = 0;
     # each VLAN WALK per port
-    while ( my ($number,$ifphysaddress) = each (%{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) ) {
+    while (my ($number,$ifphysaddress) = each %{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) {
         $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
@@ -57,7 +57,7 @@ sub GetMAC {
 sub TrunkPorts {
     my ($data, $device, $index) = @_;
 
-    while ( (my $port_id, my $trunk) = each (%{$data->{vlanTrunkPortDynamicStatus}}) ) {
+    while (my ($port_id, $trunk) = each %{$data->{vlanTrunkPortDynamicStatus}}) {
         if ($trunk == 1) {
             $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = $trunk;
         } else {
@@ -76,7 +76,7 @@ sub CDPPorts {
     my $short_number;
 
     if (ref($data->{cdpCacheAddress}) eq "HASH"){
-        while ( my ( $number, $ip_hex) = each (%{$data->{cdpCacheAddress}}) ) {
+        while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
             $ip_hex =~ s/://g;
             $short_number = $number;
             $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;

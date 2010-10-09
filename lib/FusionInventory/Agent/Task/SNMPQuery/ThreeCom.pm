@@ -14,7 +14,7 @@ sub GetMAC {
     my $add = 0;
     my $i;
 
-    while ( my ($number,$ifphysaddress) = each (%{$data->{dot1dTpFdbAddress}}) ) {
+    while (my ($number,$ifphysaddress) = each %{$data->{dot1dTpFdbAddress}}) {
         $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
