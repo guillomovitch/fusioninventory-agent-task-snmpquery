@@ -579,7 +579,7 @@ sub query_device_threaded {
     } else {
         # Query SNMP get #
         if ($params->{device}->{TYPE} eq "PRINTER") {
-            $params = cartridgesupport($params);
+            $params = cartridgeSupport($params);
         }
         for $key ( keys %{$params->{modellist}->{GET}} ) {
             if ($params->{modellist}->{GET}->{$key}->{VLAN} == 0) {
@@ -989,7 +989,7 @@ sub putPourcentageOid {
     my $xmlelement1 = shift;
     my $xmlelement2 = shift;
     if (exists $HashDataSNMP->{$element1}) {
-        if ((is_integer($HashDataSNMP->{$element2})) && (is_integer($HashDataSNMP->{$element1})) && ($HashDataSNMP->{$element1} ne '0')) {
+        if ((isInteger($HashDataSNMP->{$element2})) && (isInteger($HashDataSNMP->{$element1})) && ($HashDataSNMP->{$element1} ne '0')) {
             $datadevice->{$xmlelement1}->{$xmlelement2} = int ( ( 100 * $HashDataSNMP->{$element2} ) / $HashDataSNMP->{$element1} );
             delete $HashDataSNMP->{$element2};
             delete $HashDataSNMP->{$element1};
@@ -1008,7 +1008,7 @@ sub lastSplitObject {
 }
 
 
-sub cartridgesupport {
+sub cartridgeSupport {
     my $params = shift;
 
     for my $key ( keys %{$params->{modellist}->{GET}} ) {
@@ -1026,7 +1026,7 @@ sub cartridgesupport {
 }
 
 
-sub is_integer {
+sub isInteger {
     $_[0] =~ /^[+-]?\d+$/;
 }
 
