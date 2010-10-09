@@ -949,34 +949,49 @@ sub putSimpleOid {
     my $xmlelement2 = shift;
 
     return unless exists $HashDataSNMP->{$element};
-
-    # Rewrite hexa to string
-    if (($element eq "name") || ($element eq "otherserial")) {
-        $HashDataSNMP->{$element} = hexaToString($HashDataSNMP->{$element});
-    }
-
-    # End rewrite hexa to string
-    if (($element eq "ram") || ($element eq "memory")) {
-        $HashDataSNMP->{$element} = int(( $HashDataSNMP->{$element} / 1024 ) / 1024);
-    }
-
-    if ($element eq "serial") {
-        $HashDataSNMP->{$element} =~ s/^\s+//;
-        $HashDataSNMP->{$element} =~ s/\s+$//;
-        $HashDataSNMP->{$element} =~ s/(\.{2,})*//g;
-    }
-
-    if ($element eq "firmware1") {
-        $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{"firmware1"}." ".$HashDataSNMP->{"firmware2"};
-        delete $HashDataSNMP->{"firmware2"};
-    } elsif (($element =~ /^toner/) || ($element eq "wastetoner") || ($element =~ /^cartridge/) || ($element eq "maintenancekit") || ($element =~ /^drum/)) {
-        if ($HashDataSNMP->{$element."-level"} eq "-3") {
-            $datadevice->{$xmlelement1}->{$xmlelement2} = 100;
-        } else {
-            ($datadevice, $HashDataSNMP) = putPercentOid($HashDataSNMP,$datadevice,$element."-capacitytype",$element."-level", $xmlelement1, $xmlelement2);
-            #$datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element."-level"};
+    
+    SWITCH: {
+        if ($element eq "name" || $element eq "otherserial") {
+            # Rewrite hexa to string
+            $HashDataSNMP->{$element} = hexaToString($HashDataSNMP->{$element});
+            last SWITCH;
         }
-    } else {
+
+        if ($element eq "ram" || $element eq "memory") {
+            # End rewrite hexa to string
+            $HashDataSNMP->{$element} = int(( $HashDataSNMP->{$element} / 1024 ) / 1024);
+            last SWITCH;
+        }
+
+        if ($element eq "serial") {
+            $HashDataSNMP->{$element} =~ s/^\s+//;
+            $HashDataSNMP->{$element} =~ s/\s+$//;
+            $HashDataSNMP->{$element} =~ s/(\.{2,})*//g;
+            last SWITCH;
+        }
+
+        if ($element eq "firmware1") {
+            $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{"firmware1"}." ".$HashDataSNMP->{"firmware2"};
+            delete $HashDataSNMP->{"firmware2"};
+            last SWITCH;
+        }
+        
+        if (
+            $element =~ /^toner/ ||
+            $element eq "wastetoner" ||
+            $element =~ /^cartridge/ ||
+            $element eq "maintenancekit" ||
+            $element =~ /^drum/
+        ) {
+            if ($HashDataSNMP->{$element."-level"} eq "-3") {
+                $datadevice->{$xmlelement1}->{$xmlelement2} = 100;
+            } else {
+                putPercentOid($HashDataSNMP,$datadevice,$element."-capacitytype",$element."-level", $xmlelement1, $xmlelement2);
+            }
+            last SWITCH;
+        }
+
+        # default
         $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element};
     }
 
