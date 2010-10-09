@@ -4,33 +4,31 @@ use strict;
 use warnings;
 
 sub TrunkPorts {
-   my $HashDataSNMP = shift,
-   my $datadevice = shift;
-   my $index = shift;
+    my ($data, $device, $index) = @_;
 
-   while ( (my $port_id, my $trunk) = each (%{$HashDataSNMP->{vlanTrunkPortDynamicStatus}}) ) {
+   while ( (my $port_id, my $trunk) = each (%{$data->{vlanTrunkPortDynamicStatus}}) ) {
       if ($trunk eq "1") {
-         $datadevice->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = $trunk;
+         $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = $trunk;
       } else {
-         $datadevice->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = '0';
+         $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = '0';
       }
-      delete $HashDataSNMP->{vlanTrunkPortDynamicStatus}->{$port_id};
+      delete $data->{vlanTrunkPortDynamicStatus}->{$port_id};
    }
-   if (keys (%{$HashDataSNMP->{vlanTrunkPortDynamicStatus}}) eq "0") {
-      delete $HashDataSNMP->{vlanTrunkPortDynamicStatus};
+   if (keys (%{$data->{vlanTrunkPortDynamicStatus}}) eq "0") {
+      delete $data->{vlanTrunkPortDynamicStatus};
    }
 }
 
 sub CDPPorts {
-   my $HashDataSNMP = shift,
-   my $datadevice = shift;
+   my $data = shift,
+   my $device = shift;
    my $oid_walks = shift;
    my $index = shift;
 
    my $short_number;
 
-   if (ref($HashDataSNMP->{cdpCacheAddress}) eq "HASH"){
-      while ( my ( $number, $ip_hex) = each (%{$HashDataSNMP->{cdpCacheAddress}}) ) {
+   if (ref($data->{cdpCacheAddress}) eq "HASH"){
+      while ( my ( $number, $ip_hex) = each (%{$data->{cdpCacheAddress}}) ) {
          $ip_hex =~ s/://g;
          $short_number = $number;
          $short_number =~ s/$oid_walks->{cdpCacheAddress}->{OID}//;
@@ -38,23 +36,23 @@ sub CDPPorts {
          my @ip_num = split(/(\S{2})/, $ip_hex);
          my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
          if ($ip ne "0.0.0.0") {
-            $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
-            $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
-            if (defined($HashDataSNMP->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number})) {
-               $datadevice->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $HashDataSNMP->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number};
+            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
+            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
+            if (defined($data->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number})) {
+               $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$oid_walks->{cdpCacheDevicePort}->{OID}.$short_number};
             }
          }
-         delete $HashDataSNMP->{cdpCacheAddress}->{$number};
-         if (ref($HashDataSNMP->{cdpCacheDevicePort}) eq "HASH"){
-            delete $HashDataSNMP->{cdpCacheDevicePort}->{$number};
+         delete $data->{cdpCacheAddress}->{$number};
+         if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
+            delete $data->{cdpCacheDevicePort}->{$number};
          }
       }
-      if (keys (%{$HashDataSNMP->{cdpCacheAddress}}) eq "0") {
-         delete $HashDataSNMP->{cdpCacheAddress};
+      if (keys (%{$data->{cdpCacheAddress}}) eq "0") {
+         delete $data->{cdpCacheAddress};
       }
-      if (ref($HashDataSNMP->{cdpCacheDevicePort}) eq "HASH"){
-         if (keys (%{$HashDataSNMP->{cdpCacheDevicePort}}) eq "0") {
-            delete $HashDataSNMP->{cdpCacheDevicePort};
+      if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
+         if (keys (%{$data->{cdpCacheDevicePort}}) eq "0") {
+            delete $data->{cdpCacheDevicePort};
          }
       }
    }
@@ -63,8 +61,8 @@ sub CDPPorts {
 
 
 sub GetMAC {
-   my $HashDataSNMP = shift,
-   my $datadevice = shift;
+   my $data = shift,
+   my $device = shift;
    my $vlan_id = shift;
    my $index = shift;
    my $oid_walks = shift;
@@ -77,43 +75,43 @@ sub GetMAC {
 
    my $i = 0;
    # each VLAN WALK per port
-   while ( my ($number,$ifphysaddress) = each (%{$HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) ) {
+   while ( my ($number,$ifphysaddress) = each (%{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) ) {
       $short_number = $number;
       $short_number =~ s/$oid_walks->{dot1dTpFdbAddress}->{OID}//;
       $dot1dTpFdbPort = $oid_walks->{dot1dTpFdbPort}->{OID};
-      if (exists $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
-         if (exists $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
+      if (exists $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
+         if (exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
                               $oid_walks->{dot1dBasePortIfIndex}->{OID}.".".
-                              $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
+                              $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                            }) {
 
-            $ifIndex = $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
+            $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
                               $oid_walks->{dot1dBasePortIfIndex}->{OID}.".".
-                              $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
+                              $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                            };
-            if (not exists $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
+            if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
                my $add = 1;
                if ($ifphysaddress eq "") {
                   $add = 0;
                }
-               if ($ifphysaddress eq $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
+               if ($ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC}) {
                   $add = 0;
                }
                if ($add eq "1") {
-                  if (exists $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-                     $i = @{$datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
+                  if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
+                     $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                      #$i++;
                   } else {
                      $i = 0;
                   }
-                  $datadevice->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
+                  $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
                   $i++;
                }
             }
          }
       }
-#      delete $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}->{$number};
-#      delete $HashDataSNMP->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
+#      delete $data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}->{$number};
+#      delete $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
    }
 }
 
