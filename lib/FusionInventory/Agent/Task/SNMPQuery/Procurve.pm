@@ -14,27 +14,25 @@ sub GetMAC {
         my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
 
         my $key = $dot1dTpFdbPort . $short_number;
-        if (exists $data->{dot1dTpFdbPort}->{$key}) {
-            my $subkey =
-                $walk->{dot1dBasePortIfIndex}->{OID} .
-                "." .
-                $data->{dot1dTpFdbPort}->{$key};
+        next unless exists $data->{dot1dTpFdbPort}->{$key};
 
-            next unless exists $data->{dot1dBasePortIfIndex}->{$subkey};
+        my $subkey =
+            $walk->{dot1dBasePortIfIndex}->{OID} .
+            "." .
+            $data->{dot1dTpFdbPort}->{$key};
 
-            my $ifIndex = $data->{dot1dBasePortIfIndex}->{$subkey};
+        next unless exists $data->{dot1dBasePortIfIndex}->{$subkey};
 
-            my $port = $device->{PORTS}->{PORT}->[$index->{$ifIndex}];
+        my $ifIndex = $data->{dot1dBasePortIfIndex}->{$subkey};
 
-            next if exists $port->{CONNECTIONS}->{CDP};
-            next if $ifphysaddress eq $port->{MAC};
+        my $port = $device->{PORTS}->{PORT}->[$index->{$ifIndex}];
 
-            my $connection = $port->{CONNECTIONS}->{CONNECTION};
-            my $i = $connection ? @{$connection} : 0;
-            $connection->[$i]->{MAC} = $ifphysaddress;
-        }
-        delete $data->{dot1dTpFdbAddress}->{$number};
-        delete $data->{dot1dTpFdbPort}->{$key};
+        next if exists $port->{CONNECTIONS}->{CDP};
+        next if $ifphysaddress eq $port->{MAC};
+
+        my $connection = $port->{CONNECTIONS}->{CONNECTION};
+        my $i = $connection ? @{$connection} : 0;
+        $connection->[$i]->{MAC} = $ifphysaddress;
     }
 }
 
