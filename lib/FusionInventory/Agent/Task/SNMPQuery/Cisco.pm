@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::SNMPQuery::Cisco;
 use strict;
 use warnings;
 
+use FusionInventory::Agent::Task::SNMPQuery::Tools;
+
 sub GetMAC {
     my ($data, $device, $vlan_id, $index, $walk) = @_;
 
@@ -95,13 +97,6 @@ sub CDPPorts {
             delete $data->{cdpCacheDevicePort};
         }
     }
-}
-
-sub lastSplitObject {
-    my $var = shift;
-
-    my @array = split(/\./, $var);
-    return $array[-1];
 }
 
 1;

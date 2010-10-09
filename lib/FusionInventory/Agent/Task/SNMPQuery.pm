@@ -26,6 +26,7 @@ use FusionInventory::Agent::XML::Query::SimpleMessage;
 use FusionInventory::Agent::Task::SNMPQuery::Cisco;
 use FusionInventory::Agent::Task::SNMPQuery::Procurve;
 use FusionInventory::Agent::Task::SNMPQuery::ThreeCom;
+use FusionInventory::Agent::Task::SNMPQuery::Tools;
 
 our $VERSION = '1.2';
 my $maxIdx : shared = 0;
@@ -958,16 +959,6 @@ sub putPercentOid {
     delete $data->{$element2};
     delete $data->{$element1};
 }
-
-
-
-sub lastSplitObject {
-    my $var = shift;
-
-    my @array = split(/\./, $var);
-    return $array[-1];
-}
-
 
 sub cartridgeSupport {
     my $params = shift;
