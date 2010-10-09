@@ -723,9 +723,12 @@ sub constructDataDeviceSimple {
 sub constructDataDeviceMultiple {
     my ($data, $device, $self, $vtpVlanName_oid, $walkoid) = @_;
 
+    my $port = $device->{PORTS}->{PORT};
+    my $index = $self->{portsindex};
+
     if (exists $data->{ipAdEntAddr}) {
         my $i = 0;
-        while ( my ($key, $value) = each (%{$data->{ipAdEntAddr}}) ) {
+        while (my ($key, $value) = each %{$data->{ipAdEntAddr}}) {
             $device->{INFO}->{IPS}->{IP}->[$i] = $value;
             $i++;
         }
@@ -734,124 +737,124 @@ sub constructDataDeviceMultiple {
 
     if (exists $data->{ifIndex}) {
         my $num = 0;
-        while ( my ($key, $value) = each (%{$data->{ifIndex}}) ) {
-            $self->{portsindex}->{lastSplitObject($key)} = $num;
-            $device->{PORTS}->{PORT}->[$num]->{IFNUMBER} = $value;
+        while (my ($key, $value) = each %{$data->{ifIndex}}) {
+            $index->{lastSplitObject($key)} = $num;
+            $port->[$num]->{IFNUMBER} = $value;
             $num++;
         }
         delete $data->{ifIndex};
     }
 
     if (exists $data->{ifdescr}) {
-        while ( my ($key, $value) = each (%{$data->{ifdescr}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFDESCR} = $value;
+        while (my ($key, $value) = each %{$data->{ifdescr}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFDESCR} = $value;
         }
         delete $data->{ifdescr};
     }
 
     if (exists $data->{ifName}) {
-        while ( my ($key, $value) = each (%{$data->{ifName}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFNAME} = $value;
+        while (my ($key, $value) = each %{$data->{ifName}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFNAME} = $value;
         }
         delete $data->{ifName};
     }
 
     if (exists $data->{ifType}) {
-        while ( my ($key, $value) = each (%{$data->{ifType}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFTYPE} = $value;
+        while (my ($key, $value) = each %{$data->{ifType}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFTYPE} = $value;
         }
         delete $data->{ifType};
     }
 
     if (exists $data->{ifmtu}) {
-        while ( my ($key, $value) = each (%{$data->{ifmtu}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFMTU} = $value;
+        while (my ($key, $value) = each %{$data->{ifmtu}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFMTU} = $value;
         }
         delete $data->{ifmtu};
     }
 
     if (exists $data->{ifspeed}) {
-        while ( my ($key, $value) = each (%{$data->{ifspeed}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFSPEED} = $value;
+        while (my ($key, $value) = each %{$data->{ifspeed}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFSPEED} = $value;
         }
         delete $data->{ifspeed};
     }
 
     if (exists $data->{ifstatus}) {
-        while ( my ($key, $value) = each (%{$data->{ifstatus}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFSTATUS} = $value;
+        while (my ($key, $value) = each %{$data->{ifstatus}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFSTATUS} = $value;
         }
         delete $data->{ifstatus};
     }
 
     if (exists $data->{ifinternalstatus}) {
-        while ( my ($key, $value) = each (%{$data->{ifinternalstatus}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFINTERNALSTATUS} = $value;
+        while (my ($key, $value) = each %{$data->{ifinternalstatus}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFINTERNALSTATUS} = $value;
         }
         delete $data->{ifinternalstatus};
     }
 
     if (exists $data->{iflastchange}) {
-        while ( my ($key, $value) = each (%{$data->{iflastchange}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFLASTCHANGE} = $value;
+        while (my ($key, $value) = each %{$data->{iflastchange}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFLASTCHANGE} = $value;
         }
         delete $data->{iflastchange};
     }
 
     if (exists $data->{ifinoctets}) {
-        while ( my ($key, $value) = each (%{$data->{ifinoctets}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFINOCTETS} = $value;
+        while (my ($key, $value) = each %{$data->{ifinoctets}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFINOCTETS} = $value;
         }
         delete $data->{ifinoctets};
     }
 
     if (exists $data->{ifoutoctets}) {
-        while ( my ($key, $value) = each (%{$data->{ifoutoctets}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFOUTOCTETS} = $value;
+        while (my ($key, $value) = each %{$data->{ifoutoctets}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFOUTOCTETS} = $value;
         }
         delete $data->{ifoutoctets};
     }
 
     if (exists $data->{ifinerrors}) {
-        while ( my ($key, $value) = each (%{$data->{ifinerrors}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFINERRORS} = $value;
+        while (my ($key, $value) = each %{$data->{ifinerrors}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFINERRORS} = $value;
         }
         delete $data->{ifinerrors};
     }
 
     if (exists $data->{ifouterrors}) {
-        while ( my ($key, $value) = each (%{$data->{ifouterrors}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFOUTERRORS} = $value;
+        while (my ($key, $value) = each %{$data->{ifouterrors}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFOUTERRORS} = $value;
         }
         delete $data->{ifouterrors};
     }
 
     if (exists $data->{ifPhysAddress}) {
-        while ( my ($key, $value) = each (%{$data->{ifPhysAddress}}) ) {
+        while (my ($key, $value) = each %{$data->{ifPhysAddress}}) {
             if ($data ne "") {
 #            my @array = split(/(\S{2})/, $data);
 #            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($object)}]->{MAC} = $array[3].":".$array[5].":".$array[7].":".$array[9].":".$array[11].":".$array[13];
-                $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{MAC} = $value;
+                $port->[$index->{lastSplitObject($key)}]->{MAC} = $value;
             }
         }
         delete $data->{ifPhysAddress};
     }
 
     if (exists $data->{ifaddr}) {
-        while ( my ($key, $value) = each (%{$data->{ifaddr}}) ) {
+        while (my ($key, $value) = each %{$data->{ifaddr}}) {
             if ($data ne "") {
                 my $shortobject = $key;
                 $shortobject =~ s/$walkoid->{ifaddr}->{OID}//;
                 $shortobject =~ s/^.//;
-                $device->{PORTS}->{PORT}->[$self->{portsindex}->{$value}]->{IP} = $shortobject;
+                $port->[$index->{$value}]->{IP} = $shortobject;
             }
         }
         delete $data->{ifaddr};
     }
 
     if (exists $data->{portDuplex}) {
-        while ( my ($key, $value) = each (%{$data->{portDuplex}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{IFPORTDUPLEX} = $value;
+        while (my ($key, $value) = each %{$data->{portDuplex}}) {
+            $port->[$index->{lastSplitObject($key)}]->{IFPORTDUPLEX} = $value;
         }
         delete $data->{portDuplex};
     }
@@ -869,9 +872,9 @@ sub constructDataDeviceMultiple {
 
     # Detect VLAN
     if (exists $data->{vmvlan}) {
-        while ( my ($key, $value) = each (%{$data->{vmvlan}}) ) {
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{VLANS}->{VLAN}->{NUMBER} = $value;
-            $device->{PORTS}->{PORT}->[$self->{portsindex}->{lastSplitObject($key)}]->{VLANS}->{VLAN}->{NAME} = $data->{vtpVlanName}->{$vtpVlanName_oid.".".$value};
+        while (my ($key, $value) = each %{$data->{vmvlan}}) {
+            $port->[$index->{lastSplitObject($key)}]->{VLANS}->{VLAN}->{NUMBER} = $value;
+            $port->[$index->{lastSplitObject($key)}]->{VLANS}->{VLAN}->{NAME} = $data->{vtpVlanName}->{$vtpVlanName_oid.".".$value};
         }
         delete $data->{vmvlan};
     }
