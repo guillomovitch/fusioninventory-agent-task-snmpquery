@@ -7,29 +7,26 @@ sub GetMAC {
     my ($data, $device, $index, $walk) = @_;
 
     while (my ($number, $ifphysaddress) = each %{$data->{dot1dTpFdbAddress}}) {
+        next unless $ifphysaddress;
+
         my $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
 
-        my $add = 1;
-        if ($ifphysaddress eq "") {
-            $add = 0;
-        }
-        if (($add == 1) && (exists($data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}))) {
-            my $ifIndex = $data->{dot1dBasePortIfIndex}->{
-                $walk->{dot1dBasePortIfIndex}->{OID}.".".
-                $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
-            };
+        next unless exists $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
+        my $ifIndex = $data->{dot1dBasePortIfIndex}->{
+            $walk->{dot1dBasePortIfIndex}->{OID}.".".
+            $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
+        };
 
-            my $i;
-            if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-                $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
-            } else {
-                $i = 0;
-            }
-            $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
-            $i++;
+        my $i;
+        if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
+            $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
+        } else {
+            $i = 0;
         }
+        $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
+        $i++;
     }
 }
 
