@@ -6,27 +6,20 @@ use warnings;
 sub GetMAC {
     my ($data, $device, $index, $walk) = @_;
 
-    my $ifIndex;
-    my $numberip;
-    my $mac;
-    my $short_number;
-    my $dot1dTpFdbPort;
-
-    my $i = 0;
-
     while (my ($number, $ifphysaddress) = each %{$data->{dot1dTpFdbAddress}}) {
-        $short_number = $number;
+        my $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
-        $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
+        my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
+
         if (exists $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
             if (exists $data->{dot1dBasePortIfIndex}->{
                 $walk->{dot1dBasePortIfIndex}->{OID}.".".
                 $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                 }) {
 
-                $ifIndex = $data->{dot1dBasePortIfIndex}->{
-                $walk->{dot1dBasePortIfIndex}->{OID}.".".
-                $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
+                my $ifIndex = $data->{dot1dBasePortIfIndex}->{
+                    $walk->{dot1dBasePortIfIndex}->{OID}.".".
+                    $data->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                 };
                 if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
                     my $add = 1;
@@ -37,6 +30,7 @@ sub GetMAC {
                         $add = 0;
                     }
                     if ($add == 1) {
+                        my $i;
                         if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
                             $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                             #$i++;
