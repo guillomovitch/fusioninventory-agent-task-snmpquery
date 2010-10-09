@@ -43,13 +43,12 @@ sub TrunkPorts {
     my ($data, $device, $index) = @_;
 
     while (my ($port_id, $trunk) = each %{$data->{vlanTrunkPortDynamicStatus}}) {
-        if ($trunk == 1) {
-            $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = $trunk;
-        } else {
-            $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}]->{TRUNK} = '0';
-        }
+        my $port =
+            $device->{PORTS}->{PORT}->[$index->{lastSplitObject($port_id)}];
+        $port->{TRUNK} = $trunk == 1 ? 1 : 0;
         delete $data->{vlanTrunkPortDynamicStatus}->{$port_id};
     }
+
     if (keys (%{$data->{vlanTrunkPortDynamicStatus}}) == 0) {
         delete $data->{vlanTrunkPortDynamicStatus};
     }
