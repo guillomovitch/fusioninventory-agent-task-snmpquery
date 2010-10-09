@@ -8,32 +8,35 @@ sub GetMAC {
 
     # each VLAN WALK per port
     while (my ($number, $ifphysaddress) = each %{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) {
+
         my $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
         my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
-        if (exists $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
-            if (exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
+
+        my $key = $dot1dTpFdbPort . $short_number;
+        next unless exists $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$key};
+
+        if (exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
+            $walk->{dot1dBasePortIfIndex}->{OID}.".".
+            $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$key}
+        }) {
+
+            my $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
                 $walk->{dot1dBasePortIfIndex}->{OID}.".".
                 $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
-                }) {
+            };
+            if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
+                next unless $ifphysaddress;
+                next if $ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC};
 
-                my $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
-                    $walk->{dot1dBasePortIfIndex}->{OID}.".".
-                    $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
-                };
-                if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
-                    next unless $ifphysaddress;
-                    next if $ifphysaddress eq $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{MAC};
-
-                    my $i;
-                    if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-                        $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
-                    } else {
-                        $i = 0;
-                    }
-                    $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
-                    $i++;
+                my $i;
+                if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
+                    $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
+                } else {
+                    $i = 0;
                 }
+                $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
+                $i++;
             }
         }
 #      delete $data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}->{$number};
