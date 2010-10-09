@@ -281,10 +281,10 @@ sub startThreads {
     }
 
     # Models SNMP
-    $modelslist = modelParser($options);
+    $modelslist = getModelsList($options);
 
     # Auth SNMP
-    $authlist = authParser($options);
+    $authlist = getAuthlist($options);
 
     my $pm;
 
@@ -509,7 +509,7 @@ sub sendInformations {
     });
 }
 
-sub authParser {
+sub getAuthList {
     #my ($self, $dataAuth) = @_;
     my $dataAuth = shift;
     my $authlist = {};
@@ -539,7 +539,7 @@ sub authParser {
     return $authlist;
 }
 
-sub modelParser {
+sub getModelsList {
     my $dataModel = shift;
 
     my $modelslist = {};
