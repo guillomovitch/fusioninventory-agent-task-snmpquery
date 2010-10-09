@@ -476,7 +476,7 @@ sub startThreads {
 
 
 
-sub sendEndToServer() {
+sub sendEndToServer {
     my ($self) = @_;
 
     my $options = $self->{prologresp}->getOptionsInfoByName('SNMPQUERY');
@@ -492,7 +492,7 @@ sub sendEndToServer() {
     undef($xml_thread);
 }
 
-sub sendInformations{
+sub sendInformations {
     my ($self, $message) = @_;
 
     my $xmlMsg = FusionInventory::Agent::XML::Query::SimpleMessage->new({
