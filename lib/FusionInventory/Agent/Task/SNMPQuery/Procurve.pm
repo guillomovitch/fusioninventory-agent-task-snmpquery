@@ -54,7 +54,6 @@ sub GetMAC {
       delete $HashDataSNMP->{dot1dTpFdbAddress}->{$number};
       delete $HashDataSNMP->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number};
    }
-   return $datadevice, $HashDataSNMP;
 }
 
 
@@ -124,7 +123,6 @@ sub CDPLLDPPorts {
          }
       }
    }
-   return $datadevice, $HashDataSNMP;
 }
 
 

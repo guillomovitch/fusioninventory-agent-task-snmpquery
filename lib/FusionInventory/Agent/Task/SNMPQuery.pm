@@ -859,11 +859,11 @@ sub constructDataDeviceMultiple {
     # Detect Trunk & CDP
     if (defined ($device->{INFO}->{COMMENTS})) {
         if ($device->{INFO}->{COMMENTS} =~ /Cisco/) {
-            ($device, $data) = FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
-            ($device, $data) = FusionInventory::Agent::Task::SNMPQuery::Cisco::CDPPorts($data, $device, $walkoid, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::CDPPorts($data, $device, $walkoid, $self);
         } elsif ($device->{INFO}->{COMMENTS} =~ /ProCurve/) {
-            ($device, $data) = FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
-            ($device, $data) = FusionInventory::Agent::Task::SNMPQuery::Procurve::CDPLLDPPorts($data, $device, $walkoid, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Cisco::TrunkPorts($data, $device, $self);
+            FusionInventory::Agent::Task::SNMPQuery::Procurve::CDPLLDPPorts($data, $device, $walkoid, $self);
         }
     }
 
