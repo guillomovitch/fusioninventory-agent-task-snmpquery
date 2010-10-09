@@ -38,7 +38,6 @@ sub GetMAC {
          $i++;
       }
    }
-   return $device, $data;
 }
 
 
@@ -49,7 +48,6 @@ sub RewritePortOf225 {
    $device->{PORTS}->{PORT}->[$index->{101}]->{MAC} = $device->{PORTS}->{PORT}->[$index->{1}]->{MAC};
    delete $device->{PORTS}->{PORT}->[$index->{1}];
    delete $device->{PORTS}->{PORT}->[$index->{101}]->{CONNECTIONS};
-   return $device;
 }
 
 
