@@ -432,7 +432,7 @@ sub SendInformations{
     });
     $self->{transmitter}->send({
         message => $xmlMsg,
-        url     => $target->getUrl()
+        url     => $self->{target}->getUrl()
     });
 }
 
