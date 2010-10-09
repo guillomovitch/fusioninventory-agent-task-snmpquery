@@ -19,7 +19,6 @@ use UNIVERSAL::require;
 use XML::Simple;
 
 use FusionInventory::Logger;
-use FusionInventory::Agent::AccountInfo;
 use FusionInventory::Agent::Transmitter;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
@@ -136,27 +135,27 @@ sub StartThreads {
     }
 
     $core_counter = 0;
-    if (defined($self->{SNMPQUERY}->{DEVICE})) {
-        if (ref($self->{SNMPQUERY}->{DEVICE}) eq "HASH"){
+    if (defined($options->{DEVICE})) {
+        if (ref($options->{DEVICE}) eq "HASH"){
             #if (keys (%{$data->{DEVICE}}) == 0) {
             for (@devicetype) {
-                if ($self->{SNMPQUERY}->{DEVICE}->{TYPE} eq $_) {
-                    if (ref($self->{SNMPQUERY}->{DEVICE}) eq "HASH"){
+                if ($options->{DEVICE}->{TYPE} eq $_) {
+                    if (ref($options->{DEVICE}) eq "HASH"){
                         if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
                         $devicelist->{$core_counter}->{$countnb[$core_counter]} = {
-                            ID             => $self->{SNMPQUERY}->{DEVICE}->{ID},
-                            IP             => $self->{SNMPQUERY}->{DEVICE}->{IP},
-                            TYPE           => $self->{SNMPQUERY}->{DEVICE}->{TYPE},
-                            AUTHSNMP_ID    => $self->{SNMPQUERY}->{DEVICE}->{AUTHSNMP_ID},
-                            MODELSNMP_ID   => $self->{SNMPQUERY}->{DEVICE}->{MODELSNMP_ID}
+                            ID             => $options->{DEVICE}->{ID},
+                            IP             => $options->{DEVICE}->{IP},
+                            TYPE           => $options->{DEVICE}->{TYPE},
+                            AUTHSNMP_ID    => $options->{DEVICE}->{AUTHSNMP_ID},
+                            MODELSNMP_ID   => $options->{DEVICE}->{MODELSNMP_ID}
                         };
                         $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
                         $countnb[$core_counter]++;
                         $core_counter++;
                     } else {
-                        foreach $num (@{$self->{SNMPQUERY}->{DEVICE}->{$_}}) {
+                        foreach $num (@{$options->{DEVICE}->{$_}}) {
                             if ($core_counter eq $params->{CORE_QUERY}) {
                                 $core_counter = 0;
                             }
@@ -170,7 +169,7 @@ sub StartThreads {
                 }
             }
         } else {
-            foreach $device (@{$self->{SNMPQUERY}->{DEVICE}}) {
+            foreach $device (@{$options->{DEVICE}}) {
                 if (defined($device)) {
                     if (ref($device) eq "HASH"){
                         if ($core_counter eq $params->{CORE_QUERY}) {
@@ -205,10 +204,10 @@ sub StartThreads {
     }
 
     # Models SNMP
-    $modelslist = ModelParser($self->{SNMPQUERY});
+    $modelslist = ModelParser($options);
 
     # Auth SNMP
-    $authlist = AuthParser($self->{SNMPQUERY});
+    $authlist = AuthParser($options);
 
     my $pm;
 
@@ -300,7 +299,7 @@ sub StartThreads {
                                 });
                             $xml_thread->{DEVICE}->[$count] = $datadevice;
                             $xml_thread->{MODULEVERSION} = $VERSION;
-                            $xml_thread->{PROCESSNUMBER} = $self->{SNMPQUERY}->{PARAM}->[0]->{PID};
+                            $xml_thread->{PROCESSNUMBER} = $params->{PID};
                             $count++;
                             if (($count == 1) || (($loopthread == 1) && ($count > 0))) {
                                 $maxIdx++;
@@ -328,7 +327,7 @@ sub StartThreads {
         $xml_thread->{AGENT}->{START} = '1';
         $xml_thread->{AGENT}->{AGENTVERSION} = $self->{config}->{VERSION};
         $xml_thread->{MODULEVERSION} = $VERSION;
-        $xml_thread->{PROCESSNUMBER} = $self->{SNMPQUERY}->{PARAM}->[0]->{PID};
+        $xml_thread->{PROCESSNUMBER} = $params->{PID};
         $self->SendInformations({
                 data => $xml_thread
             });
@@ -391,7 +390,7 @@ sub StartThreads {
     # Send infos to server :
     undef($xml_thread);
     $xml_thread->{AGENT}->{END} = '1';
-    $xml_thread->{PROCESSNUMBER} = $self->{SNMPQUERY}->{PARAM}->[0]->{PID};
+    $xml_thread->{PROCESSNUMBER} = $params->{PID};
     sleep 1; # Wait for threads be terminated
     $self->SendInformations({
             data => $xml_thread
@@ -410,7 +409,7 @@ sub sendEndToServer() {
     # Send infos to server :
     my $xml_thread;
     $xml_thread->{AGENT}->{END} = '1';
-    $xml_thread->{PROCESSNUMBER} = $self->{SNMPQUERY}->{PARAM}->[0]->{PID};
+    $xml_thread->{PROCESSNUMBER} = $params->{PID};
     $self->SendInformations({
             data => $xml_thread
         });
