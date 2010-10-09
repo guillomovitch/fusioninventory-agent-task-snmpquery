@@ -948,36 +948,39 @@ sub putSimpleOid {
     my $xmlelement1 = shift;
     my $xmlelement2 = shift;
 
-    if (exists $HashDataSNMP->{$element}) {
-        # Rewrite hexa to string
-        if (($element eq "name") || ($element eq "otherserial")) {
-            $HashDataSNMP->{$element} = hexaToString($HashDataSNMP->{$element});
-        }
-        # End rewrite hexa to string
-        if (($element eq "ram") || ($element eq "memory")) {
-            $HashDataSNMP->{$element} = int(( $HashDataSNMP->{$element} / 1024 ) / 1024);
-        }
-        if ($element eq "serial") {
-            $HashDataSNMP->{$element} =~ s/^\s+//;
-            $HashDataSNMP->{$element} =~ s/\s+$//;
-            $HashDataSNMP->{$element} =~ s/(\.{2,})*//g;
-        }
-        if ($element eq "firmware1") {
-            $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{"firmware1"}." ".$HashDataSNMP->{"firmware2"};
-            delete $HashDataSNMP->{"firmware2"};
-        } elsif (($element =~ /^toner/) || ($element eq "wastetoner") || ($element =~ /^cartridge/) || ($element eq "maintenancekit") || ($element =~ /^drum/)) {
-            if ($HashDataSNMP->{$element."-level"} eq "-3") {
-                $datadevice->{$xmlelement1}->{$xmlelement2} = 100;
-            } else {
-                ($datadevice, $HashDataSNMP) = putPercentOid($HashDataSNMP,$datadevice,$element."-capacitytype",$element."-level", $xmlelement1, $xmlelement2);
-                #$datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element."-level"};
-            }
-        } else {
-            $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element};
-        }
-        delete $HashDataSNMP->{$element};
+    return unless exists $HashDataSNMP->{$element};
 
+    # Rewrite hexa to string
+    if (($element eq "name") || ($element eq "otherserial")) {
+        $HashDataSNMP->{$element} = hexaToString($HashDataSNMP->{$element});
     }
+
+    # End rewrite hexa to string
+    if (($element eq "ram") || ($element eq "memory")) {
+        $HashDataSNMP->{$element} = int(( $HashDataSNMP->{$element} / 1024 ) / 1024);
+    }
+
+    if ($element eq "serial") {
+        $HashDataSNMP->{$element} =~ s/^\s+//;
+        $HashDataSNMP->{$element} =~ s/\s+$//;
+        $HashDataSNMP->{$element} =~ s/(\.{2,})*//g;
+    }
+
+    if ($element eq "firmware1") {
+        $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{"firmware1"}." ".$HashDataSNMP->{"firmware2"};
+        delete $HashDataSNMP->{"firmware2"};
+    } elsif (($element =~ /^toner/) || ($element eq "wastetoner") || ($element =~ /^cartridge/) || ($element eq "maintenancekit") || ($element =~ /^drum/)) {
+        if ($HashDataSNMP->{$element."-level"} eq "-3") {
+            $datadevice->{$xmlelement1}->{$xmlelement2} = 100;
+        } else {
+            ($datadevice, $HashDataSNMP) = putPercentOid($HashDataSNMP,$datadevice,$element."-capacitytype",$element."-level", $xmlelement1, $xmlelement2);
+            #$datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element."-level"};
+        }
+    } else {
+        $datadevice->{$xmlelement1}->{$xmlelement2} = $HashDataSNMP->{$element};
+    }
+
+    delete $HashDataSNMP->{$element};
 }
 
 sub putPercentOid {
@@ -987,13 +990,19 @@ sub putPercentOid {
     my $element2 = shift;
     my $xmlelement1 = shift;
     my $xmlelement2 = shift;
-    if (exists $HashDataSNMP->{$element1}) {
-        if ((isInteger($HashDataSNMP->{$element2})) && (isInteger($HashDataSNMP->{$element1})) && ($HashDataSNMP->{$element1} ne '0')) {
-            $datadevice->{$xmlelement1}->{$xmlelement2} = int ( ( 100 * $HashDataSNMP->{$element2} ) / $HashDataSNMP->{$element1} );
-            delete $HashDataSNMP->{$element2};
-            delete $HashDataSNMP->{$element1};
-        }
-    }
+
+    return unless exists $HashDataSNMP->{$element1};
+
+    return unless
+        isInteger($HashDataSNMP->{$element2}) &&
+        isInteger($HashDataSNMP->{$element1}) &&
+        $HashDataSNMP->{$element1} ne '0';
+
+    $datadevice->{$xmlelement1}->{$xmlelement2} =
+        int ((100 * $HashDataSNMP->{$element2}) / $HashDataSNMP->{$element1});
+
+    delete $HashDataSNMP->{$element2};
+    delete $HashDataSNMP->{$element1};
 }
 
 
