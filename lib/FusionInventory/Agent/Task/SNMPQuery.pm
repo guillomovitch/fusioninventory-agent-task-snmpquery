@@ -510,91 +510,81 @@ sub sendInformations {
 }
 
 sub getAuthList {
-    #my ($self, $dataAuth) = @_;
-    my $dataAuth = shift;
-    my $authlist = {};
-    if (ref($dataAuth->{AUTHENTICATION}) eq "HASH"){
-        $authlist->{$dataAuth->{AUTHENTICATION}->{ID}} = {
-            COMMUNITY      => $dataAuth->{AUTHENTICATION}->{COMMUNITY},
-            VERSION        => $dataAuth->{AUTHENTICATION}->{VERSION},
-            USERNAME       => $dataAuth->{AUTHENTICATION}->{USERNAME},
-            AUTHPASSWORD   => $dataAuth->{AUTHENTICATION}->{AUTHPASSPHRASE},
-            AUTHPROTOCOL   => $dataAuth->{AUTHENTICATION}->{AUTHPROTOCOL},
-            PRIVPASSWORD   => $dataAuth->{AUTHENTICATION}->{PRIVPASSPHRASE},
-            PRIVPROTOCOL   => $dataAuth->{AUTHENTICATION}->{PRIVPROTOCOL}
+    my ($options) = @_;
+
+    my $list;
+
+    if (ref($options->{AUTHENTICATION}) eq "HASH") {
+        # a single auth object
+        $list->{$options->{AUTHENTICATION}->{ID}} = {
+            COMMUNITY    => $options->{AUTHENTICATION}->{COMMUNITY},
+            VERSION      => $options->{AUTHENTICATION}->{VERSION},
+            USERNAME     => $options->{AUTHENTICATION}->{USERNAME},
+            AUTHPASSWORD => $options->{AUTHENTICATION}->{AUTHPASSPHRASE},
+            AUTHPROTOCOL => $options->{AUTHENTICATION}->{AUTHPROTOCOL},
+            PRIVPASSWORD => $options->{AUTHENTICATION}->{PRIVPASSPHRASE},
+            PRIVPROTOCOL => $options->{AUTHENTICATION}->{PRIVPROTOCOL}
         };
     } else {
-        foreach my $num (@{$dataAuth->{AUTHENTICATION}}) {
-            $authlist->{ $num->{ID} } = {
-                COMMUNITY      => $num->{COMMUNITY},
-                VERSION        => $num->{VERSION},
-                USERNAME       => $num->{USERNAME},
-                AUTHPASSWORD   => $num->{AUTHPASSPHRASE},
-                AUTHPROTOCOL   => $num->{AUTHPROTOCOL},
-                PRIVPASSWORD   => $num->{PRIVPASSPHRASE},
-                PRIVPROTOCOL   => $num->{PRIVPROTOCOL}
+        # a list of auth objects
+        foreach my $auth (@{$options->{AUTHENTICATION}}) {
+            $list->{$auth->{ID}} = {
+                COMMUNITY    => $auth->{COMMUNITY},
+                VERSION      => $auth->{VERSION},
+                USERNAME     => $auth->{USERNAME},
+                AUTHPASSWORD => $auth->{AUTHPASSPHRASE},
+                AUTHPROTOCOL => $auth->{AUTHPROTOCOL},
+                PRIVPASSWORD => $auth->{PRIVPASSPHRASE},
+                PRIVPROTOCOL => $auth->{PRIVPROTOCOL}
             };
         }
     }
-    return $authlist;
+
+    return $list;
 }
 
 sub getModelsList {
-    my $dataModel = shift;
+    my ($options) = @_;
 
-    my $modelslist = {};
-    my $lists;
     my $list;
-    if (ref($dataModel->{MODEL}) eq "HASH"){
-        foreach $lists (@{$dataModel->{MODEL}->{GET}}) {
-            $modelslist->{$dataModel->{MODEL}->{ID}}->{GET}->{$lists->{OBJECT}} = {
-                OBJECT   => $lists->{OBJECT},
-                OID      => $lists->{OID},
-                VLAN     => $lists->{VLAN}
+
+    if (ref($options->{MODEL}) eq "HASH") {
+        # a single model object
+        foreach my $item (@{$options->{MODEL}->{GET}}) {
+            $list->{$options->{MODEL}->{ID}}->{GET}->{$item->{OBJECT}} = {
+                OBJECT => $item->{OBJECT},
+                OID    => $item->{OID},
+                VLAN   => $item->{VLAN}
             };
         }
-        undef $lists;
-        foreach $lists (@{$dataModel->{MODEL}->{WALK}}) {
-            $modelslist->{$dataModel->{MODEL}->{ID}}->{WALK}->{$lists->{OBJECT}} = {
-                OBJECT   => $lists->{OBJECT},
-                OID      => $lists->{OID},
-                VLAN     => $lists->{VLAN}
+        foreach my $item (@{$options->{MODEL}->{WALK}}) {
+            $list->{$options->{MODEL}->{ID}}->{WALK}->{$item->{OBJECT}} = {
+                OBJECT => $item->{OBJECT},
+                OID    => $item->{OID},
+                VLAN   => $item->{VLAN}
             };
         }
-        undef $lists;
     } else {
-        foreach my $num (@{$dataModel->{MODEL}}) {
-            foreach $list ($num->{GET}) {
-                if (ref($list) eq "HASH") {
-
-                } else {
-                    foreach $lists (@{$list}) {
-                        $modelslist->{ $num->{ID} }->{GET}->{$lists->{OBJECT}} = {
-                            OBJECT   => $lists->{OBJECT},
-                            OID      => $lists->{OID},
-                            VLAN     => $lists->{VLAN}
-                        };
-                    }
-                }
-                undef $lists;
+        # a list of model objects
+        foreach my $model (@{$options->{MODEL}}) {
+            foreach my $item ($model->{GET}) {
+                $list->{$model->{ID}}->{GET}->{$item->{OBJECT}} = {
+                    OBJECT => $item->{OBJECT},
+                    OID    => $item->{OID},
+                    VLAN   => $item->{VLAN}
+                };
             }
-            foreach $list ($num->{WALK}) {
-                if (ref($list) eq "HASH") {
-
-                } else {
-                    foreach $lists (@{$list}) {
-                        $modelslist->{ $num->{ID} }->{WALK}->{$lists->{OBJECT}} = {
-                            OBJECT   => $lists->{OBJECT},
-                            OID      => $lists->{OID},
-                            VLAN     => $lists->{VLAN}
-                        };
-                    }
-                }
-                undef $lists;
-            }         
+            foreach my $item ($model->{WALK}) {
+                $list->{$model->{ID}}->{WALK}->{$item->{OBJECT}} = {
+                    OBJECT => $item->{OBJECT},
+                    OID    => $item->{OID},
+                    VLAN   => $item->{VLAN}
+                };
+            }
         }
     }
-    return $modelslist;
+
+    return $list;
 }
 
 sub query_device_threaded {
