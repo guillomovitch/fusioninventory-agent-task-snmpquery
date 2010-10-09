@@ -45,16 +45,10 @@ sub CDPLLDPPorts {
 
     if (ref($data->{cdpCacheAddress}) eq "HASH"){
         while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
-            $ip_hex =~ s/://g;
             $short_number = $number;
             $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
             my @array = split(/\./, $short_number);
-            my @ip_num = split(/(\S{2})/, $ip_hex);
-            my $ip =
-                (hex $ip_num[3]) . "." .
-                (hex $ip_num[5]) . "." .
-                (hex $ip_num[7]) . "." .
-                (hex $ip_num[9]);
+            my $ip = getStringIpAddress($ip_hex);
             if ($ip ne "0.0.0.0") {
                 $port_number[$array[1]] = 1;
                 my $port = $device->{PORTS}->{PORT}->[$index->{$array[1]}];
