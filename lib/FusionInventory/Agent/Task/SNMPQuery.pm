@@ -583,8 +583,7 @@ sub query_device_threaded {
         $datadevice->{INFO}->{ID} = $params->{device}->{ID};
         $datadevice->{INFO}->{TYPE} = $params->{device}->{TYPE};
         # Conversion
-        ($datadevice, $HashDataSNMP) = constructDataDeviceSimple($HashDataSNMP,$datadevice);
-
+        constructDataDeviceSimple($HashDataSNMP,$datadevice);
 
         # Query SNMP walk #
         my $vlan_query = 0;
@@ -599,9 +598,9 @@ sub query_device_threaded {
                 }
             }
         }
-        # Conversion
 
-        ($datadevice, $HashDataSNMP) = constructDataDeviceMultiple($HashDataSNMP,$datadevice, $self, $params->{modellist}->{WALK}->{vtpVlanName}->{OID}, $params->{modellist}->{WALK});
+        # Conversion
+        constructDataDeviceMultiple($HashDataSNMP,$datadevice, $self, $params->{modellist}->{WALK}->{vtpVlanName}->{OID}, $params->{modellist}->{WALK});
 
         if ($datadevice->{INFO}->{TYPE} eq "NETWORKING") {
             # Scan for each vlan (for specific switch manufacturer && model)
@@ -757,7 +756,6 @@ sub constructDataDeviceSimple {
         putPercentOid($HashDataSNMP,$datadevice,'cartridgesmaintenancekitMAX','cartridgesmaintenancekitREMAIN',
             'CARTRIDGE','MAINTENANCEKIT');
     }
-    return $datadevice, $HashDataSNMP;
 }
 
 
@@ -907,9 +905,6 @@ sub constructDataDeviceMultiple {
         }
         delete $HashDataSNMP->{vmvlan};
     }
-
-
-    return $datadevice, $HashDataSNMP;
 }
 
 sub putSimpleOid {
