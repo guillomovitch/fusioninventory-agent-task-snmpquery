@@ -57,33 +57,35 @@ sub TrunkPorts {
 sub CDPPorts {
     my ($data, $device, $walk, $index) = @_;
 
-    if (ref($data->{cdpCacheAddress}) eq "HASH"){
-        while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
-            $ip_hex =~ s/://g;
-            my $short_number = $number;
-            $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
-            my @array = split(/\./, $short_number);
-            my @ip_num = split(/(\S{2})/, $ip_hex);
-            my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
-            if ($ip ne "0.0.0.0") {
-                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
-                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
-                if (defined($data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number})) {
-                    $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number};
-                }
-            }
-            delete $data->{cdpCacheAddress}->{$number};
-            if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
-                delete $data->{cdpCacheDevicePort}->{$number};
+    next unless ref $data->{cdpCacheAddress} eq "HASH";
+
+    while (my ($number, $ip_hex) = each %{$data->{cdpCacheAddress}}) {
+        $ip_hex =~ s/://g;
+        my $short_number = $number;
+        $short_number =~ s/$walk->{cdpCacheAddress}->{OID}//;
+        my @array = split(/\./, $short_number);
+        my @ip_num = split(/(\S{2})/, $ip_hex);
+        my $ip = (hex $ip_num[3]).".".(hex $ip_num[5]).".".(hex $ip_num[7]).".".(hex $ip_num[9]);
+        if ($ip ne "0.0.0.0") {
+            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
+            $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CDP} = "1";
+            if (defined($data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number})) {
+                $device->{PORTS}->{PORT}->[$index->{$array[1]}]->{CONNECTIONS}->{CONNECTION}->{IFDESCR} = $data->{cdpCacheDevicePort}->{$walk->{cdpCacheDevicePort}->{OID}.$short_number};
             }
         }
-        if (keys (%{$data->{cdpCacheAddress}}) == 0) {
-            delete $data->{cdpCacheAddress};
-        }
+        delete $data->{cdpCacheAddress}->{$number};
         if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
-            if (keys (%{$data->{cdpCacheDevicePort}}) == 0) {
-                delete $data->{cdpCacheDevicePort};
-            }
+            delete $data->{cdpCacheDevicePort}->{$number};
+        }
+    }
+
+    if (keys (%{$data->{cdpCacheAddress}}) == 0) {
+        delete $data->{cdpCacheAddress};
+    }
+
+    if (ref($data->{cdpCacheDevicePort}) eq "HASH"){
+        if (keys (%{$data->{cdpCacheDevicePort}}) == 0) {
+            delete $data->{cdpCacheDevicePort};
         }
     }
 }
