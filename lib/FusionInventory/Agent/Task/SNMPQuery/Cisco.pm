@@ -33,14 +33,9 @@ sub GetMAC {
         next if exists $port->{CONNECTIONS}->{CDP};
         next if $ifphysaddress eq $port->{MAC};
 
-        my $i;
-        if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
-            $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
-        } else {
-            $i = 0;
-        }
-        $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}->[$i]->{MAC} = $ifphysaddress;
-        $i++;
+        my $connection = $port->{CONNECTIONS}->{CONNECTION};
+        my $i = $connection ? @{$connection} : 0;
+        $connection->[$i]->{MAC} = $ifphysaddress;
     }
 }
 
