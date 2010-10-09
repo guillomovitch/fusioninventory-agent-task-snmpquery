@@ -6,27 +6,20 @@ use warnings;
 sub GetMAC {
     my ($data, $device, $vlan_id, $index, $walk) = @_;
 
-    my $ifIndex;
-    my $numberip;
-    my $mac;
-    my $short_number;
-    my $dot1dTpFdbPort;
-
-    my $i = 0;
     # each VLAN WALK per port
-    while (my ($number,$ifphysaddress) = each %{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) {
-        $short_number = $number;
+    while (my ($number, $ifphysaddress) = each %{$data->{VLAN}->{$vlan_id}->{dot1dTpFdbAddress}}) {
+        my $short_number = $number;
         $short_number =~ s/$walk->{dot1dTpFdbAddress}->{OID}//;
-        $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
+        my $dot1dTpFdbPort = $walk->{dot1dTpFdbPort}->{OID};
         if (exists $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}) {
             if (exists $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
                 $walk->{dot1dBasePortIfIndex}->{OID}.".".
                 $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                 }) {
 
-                $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
-                $walk->{dot1dBasePortIfIndex}->{OID}.".".
-                $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
+                my $ifIndex = $data->{VLAN}->{$vlan_id}->{dot1dBasePortIfIndex}->{
+                    $walk->{dot1dBasePortIfIndex}->{OID}.".".
+                    $data->{VLAN}->{$vlan_id}->{dot1dTpFdbPort}->{$dot1dTpFdbPort.$short_number}
                 };
                 if (not exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CDP}) {
                     my $add = 1;
@@ -37,6 +30,7 @@ sub GetMAC {
                         $add = 0;
                     }
                     if ($add == 1) {
+                        my $i;
                         if (exists $device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}) {
                             $i = @{$device->{PORTS}->{PORT}->[$index->{$ifIndex}]->{CONNECTIONS}->{CONNECTION}};
                             #$i++;
