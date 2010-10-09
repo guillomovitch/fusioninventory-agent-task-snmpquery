@@ -285,7 +285,7 @@ sub startThreads {
     $modelslist = getModelsList($options);
 
     # Auth SNMP
-    $authlist = getAuthlist($options);
+    $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
 
     my $pm;
 
@@ -508,24 +508,6 @@ sub sendInformations {
         message => $xmlMsg,
         url     => $self->{target}->getUrl()
     });
-}
-
-sub getAuthList {
-    my ($options) = @_;
-
-    my $list;
-
-    if (ref($options->{AUTHENTICATION}) eq "HASH") {
-        # a single auth object
-        $list->{$options->{AUTHENTICATION}->{ID}} = $options->{AUTHENTICATION};
-    } else {
-        # a list of auth objects
-        foreach my $auth (@{$options->{AUTHENTICATION}}) {
-            $list->{$auth->{ID}} = $auth;
-        }
-    }
-
-    return $list;
 }
 
 sub getModelsList {
