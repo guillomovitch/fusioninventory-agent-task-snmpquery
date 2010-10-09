@@ -983,7 +983,7 @@ sub cartridgeSupport {
 
 
 sub isInteger {
-    $_[0] =~ /^[+-]?\d+$/;
+    return $_[0] =~ /^[+-]?\d+$/;
 }
 
 sub hexaToString {
