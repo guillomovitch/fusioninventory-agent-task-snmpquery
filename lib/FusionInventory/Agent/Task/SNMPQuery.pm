@@ -80,7 +80,7 @@ sub run {
 
 
 sub StartThreads {
-    my ($self, $params) = @_;
+    my ($self) = @_;
 
     my $num_files = 1;
     my $device;
@@ -405,6 +405,9 @@ sub sendEndToServer() {
     my ($self) = @_;
 
     push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16*1024);
+
+    my $options = $self->{prologresp}->getOptionsInfoByName('SNMPQUERY');
+    my $params  = $options->{PARAM}->[0];
 
     # Send infos to server :
     my $xml_thread;
