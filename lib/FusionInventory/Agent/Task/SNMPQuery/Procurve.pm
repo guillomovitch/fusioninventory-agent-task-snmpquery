@@ -55,7 +55,7 @@ sub CDPLLDPPorts {
                 (hex $ip_num[5]) . "." .
                 (hex $ip_num[7]) . "." .
                 (hex $ip_num[9]);
-            if (($ip ne "0.0.0.0") && ($ip =~ /^([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])\.([O1]?\d\d?|2[0-4]\d|25[0-5])$/)){
+            if ($ip ne "0.0.0.0") {
                 $port_number[$array[1]] = 1;
                 my $port = $device->{PORTS}->{PORT}->[$index->{$array[1]}];
                 $port->{CONNECTIONS}->{CONNECTION}->{IP} = $ip;
