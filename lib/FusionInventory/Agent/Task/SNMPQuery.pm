@@ -441,11 +441,6 @@ sub handleDevices {
 sub queryDevice {
     my ($self, $params) = @_;
 
-    my $ArraySNMPwalk = {};
-    my $HashDataSNMP = {};
-    my $datadevice = {};
-    my $key;
-
     #threads->yield;
     ############### SNMP Queries ###############
     my $session;
@@ -484,10 +479,15 @@ sub queryDevice {
         }
     } unless $description;
 
-    # Query SNMP get #
     if ($params->{device}->{TYPE} eq "PRINTER") {
         $params = cartridgeSupport($params);
     }
+
+    my $ArraySNMPwalk;
+    my $HashDataSNMP;
+    my $datadevice;
+
+    # Query SNMP get #
     foreach my $key (keys %{$params->{modellist}->{GET}}) {
         if ($params->{modellist}->{GET}->{$key}->{VLAN} == 0) {
             my $oid_result = $session->snmpGet({
