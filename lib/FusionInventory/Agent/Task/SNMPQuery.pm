@@ -256,9 +256,6 @@ sub startThreads {
 
         my $xml_thread = {};                                                   
         my $count = 0;
-        my $xmlout;
-        my $xml;
-        my $data_compressed;
         my $loopthread = 0;
 
         $self->{logger}->debug("Core $p - Thread $t created");
@@ -319,7 +316,6 @@ sub startThreads {
     }
 
     my $xml_Thread : shared = '';
-    my %xml_out : shared;
     my $sendXML :shared = 0;
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
