@@ -200,14 +200,13 @@ sub startThreads {
     my @i;
     my $nbip = 0;
     my @countnb;
-    my $core_counter = 0;
 
-    for($core_counter = 0 ; $core_counter < $params->{CORE_QUERY} ; $core_counter++) {
-        $countnb[$core_counter] = 0;
-        $devicelist2{$core_counter} = &share({});
+    for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
+        $countnb[$i] = 0;
+        $devicelist2{$i} = &share({});
     }
 
-    $core_counter = 0;
+    my $core_counter = 0;
     if (defined($options->{DEVICE})) {
         if (ref($options->{DEVICE}) eq "HASH"){
             #if (keys (%{$data->{DEVICE}}) == 0) {
@@ -218,7 +217,7 @@ sub startThreads {
                         $core_counter = 0;
                     }
                     $devicelist->{$core_counter}->{$countnb[$core_counter]} = 
-                        $options->{DEVICE}
+                        $options->{DEVICE};
                     $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
                     $countnb[$core_counter]++;
                     $core_counter++;
