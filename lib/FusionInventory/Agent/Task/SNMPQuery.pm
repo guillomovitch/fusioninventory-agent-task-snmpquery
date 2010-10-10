@@ -160,11 +160,6 @@ sub run {
 sub startThreads {
     my ($self) = @_;
 
-    my $num_files = 1;
-    my $device;
-    my @devicetype;
-    my $num;
-    my $log;
 
     my $storage = $self->{target}->getStorage();
 
@@ -179,8 +174,10 @@ sub startThreads {
         }
     }
 
-    $devicetype[0] = "NETWORKING";
-    $devicetype[1] = "PRINTER";
+    my @devicetype = qw/
+        NETWORKING
+        PRINTER
+    /;
 
     my $xml_thread = {};
 
@@ -233,7 +230,7 @@ sub startThreads {
                         $countnb[$core_counter]++;
                         $core_counter++;
                     } else {
-                        foreach $num (@{$options->{DEVICE}->{$_}}) {
+                        foreach my $num (@{$options->{DEVICE}->{$_}}) {
                             if ($core_counter eq $params->{CORE_QUERY}) {
                                 $core_counter = 0;
                             }
@@ -247,7 +244,7 @@ sub startThreads {
                 }
             }
         } else {
-            foreach $device (@{$options->{DEVICE}}) {
+            foreach my $device (@{$options->{DEVICE}}) {
                 if (defined($device)) {
                     if (ref($device) eq "HASH"){
                         if ($core_counter eq $params->{CORE_QUERY}) {
@@ -265,7 +262,7 @@ sub startThreads {
                         $countnb[$core_counter]++;
                         $core_counter++;
                     } else {
-                        foreach $num (@{$device}) {
+                        foreach my $num (@{$device}) {
                             if ($core_counter eq $params->{CORE_QUERY}) {
                                 $core_counter = 0;
                             }
@@ -322,14 +319,12 @@ sub startThreads {
         #==================================
         $ArgumentsThread{'id'}[$p] = &share([]);
         $ArgumentsThread{'Bin'}[$p] = &share([]);
-        $ArgumentsThread{'log'}[$p] = &share([]);
         $ArgumentsThread{'PID'}[$p] = &share([]);
 
         my $i = 0;
         my $Bin;
         while ($i < $params->{THREADS_QUERY}) {
             $ArgumentsThread{'Bin'}[$p][$i] = $Bin;
-            $ArgumentsThread{'log'}[$p][$i] = $log;
             $ArgumentsThread{'PID'}[$p][$i] = $self->{PID};
             $i++;
         }
