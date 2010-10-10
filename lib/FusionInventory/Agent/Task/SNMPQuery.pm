@@ -184,8 +184,6 @@ sub startThreads {
     #===================================
     my %TuerThread : shared;
     my %ArgumentsThread :shared;
-    my $devicelist = {};
-    my %devicelist2 : shared;
     my @Thread;
     my $sentxml = {};
 
@@ -194,12 +192,19 @@ sub startThreads {
     $ArgumentsThread{'Bin'} = &share([]);
     $ArgumentsThread{'PID'} = &share([]);
 
-    # Dispatch devices to different core
-    my @countnb;
+    # number of devices assigned to a given core
+    my $countnb;
 
+    # gni ?
+    my $devicelist;
+
+    # gni ?
+    my $devicelist2 :shared;
+
+    # initialization
     for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
-        $countnb[$i] = 0;
-        $devicelist2{$i} = &share({});
+        $countnb->[$i] = 0;
+        $devicelist2->[$i] = &share({});
     }
 
     my $core = 0;
@@ -211,9 +216,9 @@ sub startThreads {
                 if ($core eq $params->{CORE_QUERY}) {
                     $core = 0;
                 }
-                $devicelist->{$core}->{$countnb[$core]} = $options->{DEVICE};
-                $devicelist2{$core}{$countnb[$core]} = $countnb[$core];
-                $countnb[$core]++;
+                $devicelist->[$core]->{$countnb->[$core]} = $options->{DEVICE};
+                $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
+                $countnb->[$core]++;
                 $core++;
             }
         } else {
@@ -225,9 +230,9 @@ sub startThreads {
                         $core = 0;
                     }
                     #### MODIFIER
-                    $devicelist->{$core}->{$countnb[$core]} = $device;
-                    $devicelist2{$core}{$countnb[$core]} = $countnb[$core];
-                    $countnb[$core]++;
+                    $devicelist->[$core]->{$countnb->[$core]} = $device;
+                    $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
+                    $countnb->[$core]++;
                     $core++;
                 } else {
                     foreach my $num (@{$device}) {
@@ -235,9 +240,9 @@ sub startThreads {
                             $core = 0;
                         }
                         #### MODIFIER
-                        $devicelist->{$core}->{$countnb[$core]} = $num;
-                        $devicelist2{$core}[$countnb[$core]] = $countnb[$core];
-                        $countnb[$core]++;
+                        $devicelist->[$core]->{$countnb->[$core]} = $num;
+                        $devicelist2->[$core]->[$countnb->[$core]] = $countnb->[$core];
+                        $countnb->[$core]++;
                         $core++;
                     }
                 }
@@ -261,8 +266,8 @@ sub startThreads {
         $pm = Parallel::ForkManager->new($max_procs);
     }
 
-    if ($countnb[0] <  $params->{THREADS_QUERY}) {
-        $params->{THREADS_QUERY} = $countnb[0];
+    if ($countnb->[0] <  $params->{THREADS_QUERY}) {
+        $params->{THREADS_QUERY} = $countnb->[0];
     }
 
     my $xml_Thread : shared = '';
@@ -320,20 +325,20 @@ sub startThreads {
                         # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
                         $device_id = "";
                         {
-                            lock(%devicelist2);
-                            if (keys %{$devicelist2{$p}} != 0) {
-                                my @keys = sort keys %{$devicelist2{$p}};
+                            lock($devicelist2);
+                            if (keys %{$devicelist2->[$p]} != 0) {
+                                my @keys = sort keys %{$devicelist2->[$p]};
                                 $device_id = pop @keys;
-                                delete $devicelist2{$p}{$device_id};
+                                delete $devicelist2->[$p]->{$device_id};
                             } else {
                                 $loopthread = 1;
                             }
                         }
                         if ($loopthread != 1) {
                             my $datadevice = $self->query_device_threaded({
-                                    device              => $devicelist->{$device_id},
-                                    modellist           => $modelslist->{$devicelist->{$device_id}->{MODELSNMP_ID}},
-                                    authlist            => $authlist->{$devicelist->{$device_id}->{AUTHSNMP_ID}}
+                                    device              => $devicelist->[$device_id],
+                                    modellist           => $modelslist->{$devicelist->[$device_id]->{MODELSNMP_ID}},
+                                    authlist            => $authlist->{$devicelist->[$device_id]->{AUTHSNMP_ID}}
                                 });
                             $xml_thread->{DEVICE}->[$count] = $datadevice;
                             $xml_thread->{MODULEVERSION} = $VERSION;
@@ -354,7 +359,7 @@ sub startThreads {
 
                     $TuerThread{$p}[$t] = 1;
                     $self->{logger}->debug("Core $p - Thread $t deleted");
-                }, $p, $j, $devicelist->{$p},$modelslist,$authlist,$self)->detach();
+                }, $p, $j, $devicelist->[$p],$modelslist,$authlist,$self)->detach();
             sleep 1;
         }
 
