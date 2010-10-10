@@ -123,13 +123,13 @@ sub run {
     my ($self) = @_;
 
     if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
-        $self->{logger}->debug("No server. Exiting...");
+        $self->{logger}->debug("No server to get order from. Exiting...");
         return;
     }
 
     my $options = $self->{prologresp}->getOptionsInfoByName('SNMPQUERY');
     if (!$options) {
-        $self->{logger}->debug("No SNMPQUERY. Exiting...");
+        $self->{logger}->debug("No SNMPQuery asked by the server. Exiting...");
         return;
     }
 
@@ -569,8 +569,9 @@ sub queryDevice {
             } else {
                 if (defined ($datadevice->{INFO}->{COMMENTS})) {
                     if ($datadevice->{INFO}->{COMMENTS} =~ /3Com IntelliJack/) {
-                        ($datadevice, $HashDataSNMP) = FusionInventory::Agent::Task::SNMPQuery::ThreeCom::GetMAC($HashDataSNMP,$datadevice,$self,$params->{modellist}->{WALK});
                         $datadevice = FusionInventory::Agent::Task::SNMPQuery::ThreeCom::RewritePortOf225($datadevice, $self);
+                    } elsif ($datadevice->{INFO}->{COMMENTS} =~ /3Com/) {
+                        ($datadevice, $HashDataSNMP) = FusionInventory::Agent::Task::SNMPQuery::ThreeCom::GetMAC($HashDataSNMP,$datadevice,$self,$params->{modellist}->{WALK});
                     } elsif ($datadevice->{INFO}->{COMMENTS} =~ /ProCurve/) {
                         ($datadevice, $HashDataSNMP) = FusionInventory::Agent::Task::SNMPQuery::Procurve::GetMAC($HashDataSNMP,$datadevice,$self, $params->{modellist}->{WALK});
                     }
