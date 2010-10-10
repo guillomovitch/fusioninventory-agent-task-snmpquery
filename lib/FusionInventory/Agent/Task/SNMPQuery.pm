@@ -183,14 +183,8 @@ sub startThreads {
     # Threads et variables partagÃ©es
     #===================================
     my $TuerThread : shared;
-    my %ArgumentsThread :shared;
     my @Thread;
     my $sentxml = {};
-
-    $ArgumentsThread{'id'} = &share([]);
-    $ArgumentsThread{'log'} = &share([]);
-    $ArgumentsThread{'Bin'} = &share([]);
-    $ArgumentsThread{'PID'} = &share([]);
 
     # the queue of devices for each process
     my $deviceslist;
@@ -304,18 +298,7 @@ sub startThreads {
         for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
             $TuerThread->[$i][$j]    = 0;
         }
-        #==================================
-        # Prepare in variables devices to query
-        #==================================
-        $ArgumentsThread{'id'}[$i] = &share([]);
-        $ArgumentsThread{'Bin'}[$i] = &share([]);
-        $ArgumentsThread{'PID'}[$i] = &share([]);
 
-        my $Bin;
-        for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
-            $ArgumentsThread{'Bin'}[$i][$j] = $Bin;
-            $ArgumentsThread{'PID'}[$i][$j] = $self->{PID};
-        }
         #===================================
         # Create all Threads
         #===================================
