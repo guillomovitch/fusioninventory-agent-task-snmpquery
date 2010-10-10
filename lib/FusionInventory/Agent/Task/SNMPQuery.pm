@@ -399,16 +399,17 @@ sub startThreads {
         }
 
         # Send infos to server :
-        my $xml_thread = {};
-        $xml_thread->{AGENT}->{START} = '1';
-        $xml_thread->{AGENT}->{AGENTVERSION} = $self->{config}->{VERSION};
-        $xml_thread->{MODULEVERSION} = $VERSION;
-        $xml_thread->{PROCESSNUMBER} = $params->{PID};
+        my $xml_thread = {
+            AGENT => {
+                START => 1,
+                AGENTVERSION => $self->{config}->{VERSION}
+            },
+            MODULEVERSION => $VERSION,
+            PROCESSNUMBER => $params->{PID}
+        };
         $self->sendInformations({
-                data => $xml_thread
-            });
-        undef($xml_thread);
-
+            data => $xml_thread
+        });
 
         my $exit = 0;
         while($exit == 0) {
@@ -460,15 +461,14 @@ sub startThreads {
     $storage->removeSubDumps();
 
     # Send infos to server :
-    undef($xml_thread);
-    $xml_thread->{AGENT}->{END} = '1';
-    $xml_thread->{PROCESSNUMBER} = $params->{PID};
+    my $xml_thread = {
+        AGENT => { END => 1 },
+        PROCESSNUMBER => $params->{PID}
+    };
     sleep 1; # Wait for threads be terminated
     $self->sendInformations({
-            data => $xml_thread
-        });
-    undef($xml_thread);
-
+        data => $xml_thread
+    });
 }
 
 
