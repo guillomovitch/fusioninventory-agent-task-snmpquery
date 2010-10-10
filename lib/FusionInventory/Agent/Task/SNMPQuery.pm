@@ -207,27 +207,14 @@ sub startThreads {
         if (ref($options->{DEVICE}) eq "HASH") {
             foreach my $type (@devicetype) {
                 next unless $options->{DEVICE}->{TYPE} eq $type;
-                if (ref($options->{DEVICE}) eq "HASH") {
-                    if ($core_counter eq $params->{CORE_QUERY}) {
-                        $core_counter = 0;
-                    }
-                    $devicelist->{$core_counter}->{$countnb[$core_counter]} = 
-                        $options->{DEVICE};
-                    $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
-                    $countnb[$core_counter]++;
-                    $core_counter++;
-                } else {
-                    foreach my $num (@{$options->{DEVICE}->{$type}}) {
-                        if ($core_counter eq $params->{CORE_QUERY}) {
-                            $core_counter = 0;
-                        }
-                        #### MODIFIER
-                        $devicelist->{$core_counter}->{$countnb[$core_counter]} = $num;
-                        $devicelist2{$core_counter}[$countnb[$core_counter]] = $countnb[$core_counter];
-                        $countnb[$core_counter]++;
-                        $core_counter++;
-                    }
+                if ($core_counter eq $params->{CORE_QUERY}) {
+                    $core_counter = 0;
                 }
+                $devicelist->{$core_counter}->{$countnb[$core_counter]} = 
+                    $options->{DEVICE};
+                $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
+                $countnb[$core_counter]++;
+                $core_counter++;
             }
         } else {
             foreach my $device (@{$options->{DEVICE}}) {
