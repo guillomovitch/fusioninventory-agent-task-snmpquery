@@ -188,8 +188,6 @@ sub startThreads {
     my %ArgumentsThread :shared;
     my $devicelist = {};
     my %devicelist2 : shared;
-    my $modelslist = {};
-    my $authlist = {};
     my @Thread;
     my $sentxml = {};
 
@@ -279,10 +277,10 @@ sub startThreads {
     }
 
     # Models SNMP
-    $modelslist = getModelsList($options);
+    my $modelslist = getModelsList($options);
 
     # Auth SNMP
-    $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
+    my $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
 
     my $pm;
 
