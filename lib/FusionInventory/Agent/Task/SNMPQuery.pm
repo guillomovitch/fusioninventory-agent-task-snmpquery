@@ -287,7 +287,6 @@ sub startThreads {
         }
 #      write_pid();
         # create the threads
-        my $sendbylwp : shared;
 
         #===================================
         # Create all Threads
