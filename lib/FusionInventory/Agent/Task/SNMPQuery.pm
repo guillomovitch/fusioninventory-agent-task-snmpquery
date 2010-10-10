@@ -132,7 +132,7 @@ sub run {
         return;
     }
 
-    $self->{logger}->debug("FusionInventory SNMPQuery module ".$VERSION);
+    $self->{logger}->debug("FusionInventory SNMPQuery module $VERSION");
 
     FusionInventory::Agent::SNMP->require();
     if ($EVAL_ERROR) {
@@ -140,8 +140,9 @@ sub run {
         return;
     }
 
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-    $hour  = sprintf("%02d", $hour);
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
+        localtime(time);
+    $hour = sprintf("%02d", $hour);
     $min  = sprintf("%02d", $min);
     $yday = sprintf("%04d", $yday);
     $self->{PID} = $yday.$hour.$min;
