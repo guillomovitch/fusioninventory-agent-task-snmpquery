@@ -230,15 +230,10 @@ sub startThreads {
 
         # infinite loop, until the exit condition is met
         while (1) {
-            # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
-            my $device;
-            {
-                # get the next device in this process queue, and exit the 
-                # loop if there isn't anymore
-                lock($devicelist);
-                $device = pop @{$devicelist->[$p]};
-                last unless $device;
-            }
+            # get the next device in this process queue, and exit the 
+            # loop if there isn't anymore
+            my $device = pop @{$devicelist->[$p]};
+            last unless $device;
 
             my $datadevice = $self->query_device_threaded({
                 device    => $device,
