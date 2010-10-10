@@ -192,16 +192,8 @@ sub startThreads {
     $ArgumentsThread{'Bin'} = &share([]);
     $ArgumentsThread{'PID'} = &share([]);
 
-    # the number of devices for each process
-    my $countnb;
-
     # the queue of devices for each process
     my $devicelist;
-
-    # initialization
-    for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
-        $countnb->[$i] = 0;
-    }
 
     my $core = 0;
     my $attribute_device = sub {
@@ -214,7 +206,6 @@ sub startThreads {
             $core = 0;
         }
         push @{$devicelist->[$core]}, $device;
-        $countnb->[$core]++;
         $core++;
     };
 
@@ -299,8 +290,8 @@ sub startThreads {
         $pm = Parallel::ForkManager->new($max_procs);
     }
 
-    if ($countnb->[0] <  $params->{THREADS_QUERY}) {
-        $params->{THREADS_QUERY} = $countnb->[0];
+    if (@{$deviceslist->[0]} <  $params->{THREADS_QUERY}) {
+        $params->{THREADS_QUERY} = @{$deviceslist->[0]};
     }
 
     my $xml_Thread : shared = '';
