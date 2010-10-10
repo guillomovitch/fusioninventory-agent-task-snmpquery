@@ -182,7 +182,7 @@ sub startThreads {
     #===================================
     # Threads et variables partagÃ©es
     #===================================
-    my %TuerThread : shared;
+    my $TuerThread : shared;
     my %ArgumentsThread :shared;
     my @Thread;
     my $sentxml = {};
@@ -272,12 +272,12 @@ sub startThreads {
         }
 #      write_pid();
         # create the threads
-        $TuerThread{$i} = &share([]);
+        $TuerThread->[$i] = &share([]);
         my $sendbylwp : shared;
 
 # 0 : thread is alive, 1 : thread is dead 
         for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
-            $TuerThread{$i}[$j]    = 0;
+            $TuerThread->[$i][$j]    = 0;
         }
         #==================================
         # Prepare in variables devices to query
@@ -351,7 +351,7 @@ sub startThreads {
                         sleep 1;
                     }
 
-                    $TuerThread{$p}[$t] = 1;
+                    $TuerThread->[$p][$t] = 1;
                     $self->{logger}->debug("Core $p - Thread $t deleted");
                 }, $i, $j, $devicelist->[$i],$modelslist,$authlist,$self)->detach();
             sleep 1;
@@ -375,7 +375,7 @@ sub startThreads {
             sleep 2;
             my $count = 0;
             for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
-                if ($TuerThread{$i}[$j] == 1) {
+                if ($TuerThread->[$i][$j] == 1) {
                     $count++;
                 }
                 if ( $count eq $params->{THREADS_QUERY} ) {
