@@ -179,8 +179,6 @@ sub startThreads {
         PRINTER
     /;
 
-    my $xml_thread = {};
-
     #===================================
     # Threads et variables partagÃ©es
     #===================================
@@ -197,8 +195,6 @@ sub startThreads {
     $ArgumentsThread{'PID'} = &share([]);
 
     # Dispatch devices to different core
-    my @i;
-    my $nbip = 0;
     my @countnb;
 
     for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
