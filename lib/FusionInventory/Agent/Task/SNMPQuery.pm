@@ -252,8 +252,6 @@ sub startThreads {
     my $callback = sub {
         my ($p, $t, $devicelist, $modelslist, $authlist, $self) = @_;
 
-        my $device_id;
-
         my $xml_thread = {};                                                   
         my $count = 0;
 
@@ -262,7 +260,7 @@ sub startThreads {
         # infinite loop, until the exit condition is met
         while (1) {
             # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
-            $device_id = "";
+            my $device_id;
             {
                 lock($devicelist2);
                 if (keys %{$devicelist2->[$p]} != 0) {
