@@ -235,7 +235,7 @@ sub startThreads {
             my $device = pop @{$devicelist->[$p]};
             last unless $device;
 
-            my $datadevice = $self->query_device_threaded({
+            my $datadevice = $self->queryDevice({
                 device    => $device,
                 modellist => $modelslist->{$device->{MODELSNMP_ID}},
                 authlist  => $authlist->{$device->{AUTHSNMP_ID}}
@@ -437,7 +437,7 @@ sub getModelsList {
     return $list;
 }
 
-sub query_device_threaded {
+sub queryDevice {
     my ($self, $params) = @_;
 
     my $ArraySNMPwalk = {};
