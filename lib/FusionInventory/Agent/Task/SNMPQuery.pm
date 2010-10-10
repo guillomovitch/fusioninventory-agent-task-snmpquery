@@ -321,17 +321,13 @@ sub startThreads {
             data => $xml_thread
         });
 
-        my $exit = 0;
-
-        while($exit == 0) {
+        while(1) {
             sleep 2;
 
-            # check if all threads have exited
+            # get number of running threads
             my @running =
                 grep { $_->is_running() }
                 @threads;
-                
-            $exit = 1 if @running == 0;
 
             foreach my $idx (1 .. $maxIdx) {
                 next if $sentxml->{$idx};
@@ -347,6 +343,9 @@ sub startThreads {
                 });
                 sleep 1;
             }
+
+            # exit loop if no more active threads
+            last if @running == 0;
         }
 
         if ($params->{CORE_QUERY} > 1) {
