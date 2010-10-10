@@ -483,7 +483,6 @@ sub queryDevice {
         $params = cartridgeSupport($params);
     }
 
-    my $ArraySNMPwalk;
     my $HashDataSNMP;
     my $datadevice;
 
@@ -509,10 +508,10 @@ sub queryDevice {
     # Query SNMP walk #
     my $vlan_query = 0;
     foreach my $key (keys %{$params->{modellist}->{WALK}}) {
-        $ArraySNMPwalk = $session->snmpWalk({
+        my $walk = $session->snmpWalk({
             oid_start => $params->{modellist}->{WALK}->{$key}->{OID}
         });
-        $HashDataSNMP->{$key} = $ArraySNMPwalk;
+        $HashDataSNMP->{$key} = $walk;
         if (exists($params->{modellist}->{WALK}->{$key}->{VLAN})) {
             if ($params->{modellist}->{WALK}->{$key}->{VLAN} == 1) {
                 $vlan_query = 1;
@@ -551,13 +550,12 @@ sub queryDevice {
                 translate    => 1,
             });
 
-            $ArraySNMPwalk = {};
             for my $link (keys %{$params->{modellist}->{WALK}}) {
                 if ($params->{modellist}->{WALK}->{$link}->{VLAN} == 1) {
-                    $ArraySNMPwalk = $session->snmpWalk({
+                    my $walk = $session->snmpWalk({
                         oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
                     });
-                    $HashDataSNMP->{VLAN}->{$id}->{$link} = $ArraySNMPwalk;
+                    $HashDataSNMP->{VLAN}->{$id}->{$link} = $walk;
                 }
             }
             # Detect mac adress on each port
