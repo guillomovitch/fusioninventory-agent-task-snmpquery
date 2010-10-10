@@ -250,12 +250,7 @@ sub startThreads {
     my $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
 
     my $callback = sub {
-        my $p = shift;
-        my $t = shift;
-        my $devicelist = shift;
-        my $modelslist = shift;
-        my $authlist = shift;
-        my $self = shift;
+        my ($p, $t, $devicelist, $modelslist, $authlist, $self) = @_;
 
         my $device_id;
 
