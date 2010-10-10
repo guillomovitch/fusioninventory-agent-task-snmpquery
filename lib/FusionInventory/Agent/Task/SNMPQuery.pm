@@ -276,10 +276,6 @@ sub startThreads {
         $pm = Parallel::ForkManager->new($max_procs);
     }
 
-    if (@{$deviceslist->[0]} <  $params->{THREADS_QUERY}) {
-        $params->{THREADS_QUERY} = @{$deviceslist->[0]};
-    }
-
     my $sendXML :shared = 0;
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
@@ -291,8 +287,14 @@ sub startThreads {
         #===================================
         # Create all Threads
         #===================================
+        # no need to use maximum number of allowed threads, if the number
+        # of queued devices is inferior
+        my $thread_number =
+            @{$deviceslist->[$i]} < $params->{THREADS_QUERY} ?
+            @{$deviceslist->[$i]} : $params->{THREADS_QUERY};
+
         my @threads;
-        for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
+        for (my $j = 0; $j < $thread_number; $j++) {
             my $thread = threads->create(
                 $callback,
                 $i,
