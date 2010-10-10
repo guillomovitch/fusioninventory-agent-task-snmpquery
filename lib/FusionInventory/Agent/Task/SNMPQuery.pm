@@ -255,7 +255,7 @@ sub startThreads {
         my $xml_thread = {};                                                   
         my $count = 0;
 
-        $self->{logger}->debug("Core $p - Thread $t created");
+        $self->{logger}->debug("Process $p - Thread $t created");
 
         # infinite loop, until the exit condition is met
         while (1) {
@@ -295,7 +295,7 @@ sub startThreads {
         }
 
         $TuerThread->[$p][$t] = 1;
-        $self->{logger}->debug("Core $p - Thread $t deleted");
+        $self->{logger}->debug("Process $p - Thread $t deleted");
     };
 
     my $pm;
