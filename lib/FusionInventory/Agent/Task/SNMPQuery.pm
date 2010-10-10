@@ -448,19 +448,26 @@ sub queryDevice {
 
     #threads->yield;
     ############### SNMP Queries ###############
-    my $session = FusionInventory::Agent::SNMP->new ({
-        version      => $params->{authlist}->{VERSION},
-        hostname     => $params->{device}->{IP},
-        community    => $params->{authlist}->{COMMUNITY},
-        username     => $params->{authlist}->{USERNAME},
-        authpassword => $params->{authlist}->{AUTHPASSPHRASE},
-        authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-        privpassword => $params->{authlist}->{PRIVPASSPHRASE},
-        privprotocol => $params->{authlist}->{PRIVPROTOCOL},
-        translate    => 1,
-    });
-    if (!defined($session->{SNMPSession}->{session})) {
-        return $datadevice;
+    my $session;
+    eval {
+        $session = FusionInventory::Agent::SNMP->new ({
+            version      => $params->{authlist}->{VERSION},
+            hostname     => $params->{device}->{IP},
+            community    => $params->{authlist}->{COMMUNITY},
+            username     => $params->{authlist}->{USERNAME},
+            authpassword => $params->{authlist}->{AUTHPASSPHRASE},
+            authprotocol => $params->{authlist}->{AUTHPROTOCOL},
+            privpassword => $params->{authlist}->{PRIVPASSPHRASE},
+            privprotocol => $params->{authlist}->{PRIVPROTOCOL},
+            translate    => 1,
+        });
+    };
+    if ($EVAL_ERROR) {
+        $self->{logger}->error(
+            "Unable to create SNMP session for $params->{device}->{IP}: " .
+            $EVAL_ERROR
+        );
+        return;
     }
 
     my $error = '';
