@@ -269,7 +269,6 @@ sub startThreads {
         $pm = Parallel::ForkManager->new($max_procs);
     }
 
-    my $sendXML :shared = 0;
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
             my $pid = $pm->start and next;
