@@ -270,10 +270,10 @@ sub startThreads {
 
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
-            my $pid = $pm->start and next;
+            # fork a child
+            my $pid = $pm->start();
+            next if $pid;
         }
-#      write_pid();
-        # create the threads
 
         #===================================
         # Create all Threads
@@ -341,11 +341,13 @@ sub startThreads {
         }
 
         if ($params->{CORE_QUERY} > 1) {
-            $pm->finish;
+            # finish the child
+            $pm->finish();
         }
     }
     if ($params->{CORE_QUERY} > 1) {
-        $pm->wait_all_children;
+        # ensure all children finished
+        $pm->wait_all_children();
     }
 
     foreach my $idx (1 .. $maxIdx) {
