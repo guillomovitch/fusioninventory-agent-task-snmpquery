@@ -249,6 +249,66 @@ sub startThreads {
     # Auth SNMP
     my $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
 
+    my $callback = sub {
+        my $p = shift;
+        my $t = shift;
+        my $devicelist = shift;
+        my $modelslist = shift;
+        my $authlist = shift;
+        my $self = shift;
+
+        my $device_id;
+
+        my $xml_thread = {};                                                   
+        my $count = 0;
+        my $xmlout;
+        my $xml;
+        my $data_compressed;
+        my $loopthread = 0;
+
+        $self->{logger}->debug("Core $p - Thread $t created");
+
+        while ($loopthread != 1) {
+            # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
+            $device_id = "";
+            {
+                lock($devicelist2);
+                if (keys %{$devicelist2->[$p]} != 0) {
+                    my @keys = sort keys %{$devicelist2->[$p]};
+                    $device_id = pop @keys;
+                    delete $devicelist2->[$p]->{$device_id};
+                } else {
+                    $loopthread = 1;
+                }
+            }
+            if ($loopthread != 1) {
+                my $device = $devicelist->[$device_id];
+                my $datadevice = $self->query_device_threaded({
+                    device    => $device,
+                    modellist => $modelslist->{$device->{MODELSNMP_ID}},
+                    authlist  => $authlist->{$device->{AUTHSNMP_ID}}
+                });
+                $xml_thread->{DEVICE}->[$count] = $datadevice;
+                $xml_thread->{MODULEVERSION} = $VERSION;
+                $xml_thread->{PROCESSNUMBER} = $params->{PID};
+                $count++;
+                if (($count == 1) || (($loopthread == 1) && ($count > 0))) {
+                    $maxIdx++;
+                    $storage->save({
+                        idx => $maxIdx,
+                        data => $xml_thread
+                    });
+
+                    $count = 0;
+                }
+            }
+            sleep 1;
+        }
+
+        $TuerThread->[$p][$t] = 1;
+        $self->{logger}->debug("Core $p - Thread $t deleted");
+    };
+
     my $pm;
 
     #============================================
@@ -295,65 +355,15 @@ sub startThreads {
         # Create all Threads
         #===================================
         for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
-            $Thread[$i][$j] = threads->create( sub {
-                    my $p = shift;
-                    my $t = shift;
-                    my $devicelist = shift;
-                    my $modelslist = shift;
-                    my $authlist = shift;
-                    my $self = shift;
-
-                    my $device_id;
-
-                    my $xml_thread = {};                                                   
-                    my $count = 0;
-                    my $xmlout;
-                    my $xml;
-                    my $data_compressed;
-                    my $loopthread = 0;
-
-                    $self->{logger}->debug("Core $p - Thread $t created");
-
-                    while ($loopthread != 1) {
-                        # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
-                        $device_id = "";
-                        {
-                            lock($devicelist2);
-                            if (keys %{$devicelist2->[$p]} != 0) {
-                                my @keys = sort keys %{$devicelist2->[$p]};
-                                $device_id = pop @keys;
-                                delete $devicelist2->[$p]->{$device_id};
-                            } else {
-                                $loopthread = 1;
-                            }
-                        }
-                        if ($loopthread != 1) {
-                            my $device = $devicelist->[$device_id];
-                            my $datadevice = $self->query_device_threaded({
-                                device    => $device,
-                                modellist => $modelslist->{$device->{MODELSNMP_ID}},
-                                authlist  => $authlist->{$device->{AUTHSNMP_ID}}
-                            });
-                            $xml_thread->{DEVICE}->[$count] = $datadevice;
-                            $xml_thread->{MODULEVERSION} = $VERSION;
-                            $xml_thread->{PROCESSNUMBER} = $params->{PID};
-                            $count++;
-                            if (($count == 1) || (($loopthread == 1) && ($count > 0))) {
-                                $maxIdx++;
-                                $storage->save({
-                                    idx => $maxIdx,
-                                    data => $xml_thread
-                                });
-
-                                $count = 0;
-                            }
-                        }
-                        sleep 1;
-                    }
-
-                    $TuerThread->[$p][$t] = 1;
-                    $self->{logger}->debug("Core $p - Thread $t deleted");
-                }, $i, $j, $devicelist->[$i],$modelslist,$authlist,$self)->detach();
+            $Thread[$i][$j] = threads->create(
+                $callback,
+                $i,
+                $j,
+                $devicelist->[$i],
+                $modelslist,
+                $authlist,
+                $self
+            )->detach();
             sleep 1;
         }
 
