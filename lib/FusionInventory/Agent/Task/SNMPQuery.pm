@@ -174,11 +174,6 @@ sub startThreads {
         }
     }
 
-    my @devicetype = qw/
-        NETWORKING
-        PRINTER
-    /;
-
     #===================================
     # Threads et variables partagÃ©es
     #===================================
