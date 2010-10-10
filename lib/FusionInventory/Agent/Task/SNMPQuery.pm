@@ -259,14 +259,13 @@ sub startThreads {
         $self->{logger}->debug("Process $p - Thread $t deleted");
     };
 
-    my $pm;
 
     #============================================
     # Begin ForkManager (multiple core / process)
     #============================================
-    my $max_procs = $params->{CORE_QUERY}*$params->{THREADS_QUERY};
+    my $pm;
     if ($params->{CORE_QUERY} > 1) {
-        $pm = Parallel::ForkManager->new($max_procs);
+        $pm = Parallel::ForkManager->new($params->{CORE_QUERY});
     }
 
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
