@@ -488,7 +488,7 @@ sub queryDevice {
         if ($params->{device}->{TYPE} eq "PRINTER") {
             $params = cartridgeSupport($params);
         }
-        for $key ( keys %{$params->{modellist}->{GET}} ) {
+        foreach my $key (keys %{$params->{modellist}->{GET}}) {
             if ($params->{modellist}->{GET}->{$key}->{VLAN} == 0) {
                 my $oid_result = $session->snmpGet({
                         oid => $params->{modellist}->{GET}->{$key}->{OID},
@@ -508,7 +508,7 @@ sub queryDevice {
 
         # Query SNMP walk #
         my $vlan_query = 0;
-        for $key ( keys %{$params->{modellist}->{WALK}} ) {
+        foreach my $key (keys %{$params->{modellist}->{WALK}}) {
             $ArraySNMPwalk = $session->snmpWalk({
                     oid_start => $params->{modellist}->{WALK}->{$key}->{OID}
                 });
