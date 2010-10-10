@@ -266,36 +266,36 @@ sub startThreads {
     my $xml_Thread : shared = '';
     my %xml_out : shared;
     my $sendXML :shared = 0;
-    for (my $p = 0; $p < $params->{CORE_QUERY}; $p++) {
+    for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
             my $pid = $pm->start and next;
         }
 #      write_pid();
         # create the threads
-        $TuerThread{$p} = &share([]);
+        $TuerThread{$i} = &share([]);
         my $sendbylwp : shared;
 
 # 0 : thread is alive, 1 : thread is dead 
         for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
-            $TuerThread{$p}[$j]    = 0;
+            $TuerThread{$i}[$j]    = 0;
         }
         #==================================
         # Prepare in variables devices to query
         #==================================
-        $ArgumentsThread{'id'}[$p] = &share([]);
-        $ArgumentsThread{'Bin'}[$p] = &share([]);
-        $ArgumentsThread{'PID'}[$p] = &share([]);
+        $ArgumentsThread{'id'}[$i] = &share([]);
+        $ArgumentsThread{'Bin'}[$i] = &share([]);
+        $ArgumentsThread{'PID'}[$i] = &share([]);
 
         my $Bin;
-        for (my $i = 0; $i < $params->{THREADS_QUERY}; $i++) {
-            $ArgumentsThread{'Bin'}[$p][$i] = $Bin;
-            $ArgumentsThread{'PID'}[$p][$i] = $self->{PID};
+        for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
+            $ArgumentsThread{'Bin'}[$i][$j] = $Bin;
+            $ArgumentsThread{'PID'}[$i][$j] = $self->{PID};
         }
         #===================================
         # Create all Threads
         #===================================
         for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
-            $Thread[$p][$j] = threads->create( sub {
+            $Thread[$i][$j] = threads->create( sub {
                     my $p = shift;
                     my $t = shift;
                     my $devicelist = shift;
@@ -353,7 +353,7 @@ sub startThreads {
 
                     $TuerThread{$p}[$t] = 1;
                     $self->{logger}->debug("Core $p - Thread $t deleted");
-                }, $p, $j, $devicelist->[$p],$modelslist,$authlist,$self)->detach();
+                }, $i, $j, $devicelist->[$i],$modelslist,$authlist,$self)->detach();
             sleep 1;
         }
 
@@ -374,8 +374,8 @@ sub startThreads {
         while($exit == 0) {
             sleep 2;
             my $count = 0;
-            for (my $i = 0 ; $i < $params->{THREADS_QUERY} ; $i++) {
-                if ($TuerThread{$p}[$i] == 1) {
+            for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
+                if ($TuerThread{$i}[$j] == 1) {
                     $count++;
                 }
                 if ( $count eq $params->{THREADS_QUERY} ) {
