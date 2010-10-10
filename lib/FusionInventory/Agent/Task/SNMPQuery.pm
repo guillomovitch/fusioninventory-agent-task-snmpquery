@@ -533,7 +533,7 @@ sub queryDevice {
         # Scan for each vlan (for specific switch manufacturer && model)
         # Implique de recrÃ©er une session spÃ©cialement pour chaque vlan : communautÃ©@vlanID
         if ($vlan_query == 1) {
-            while ( (my $vlan_id,my $vlan_name) = each (%{$HashDataSNMP->{'vtpVlanName'}}) ) {
+            while ( my ($vlan_id, $vlan_name) = each (%{$HashDataSNMP->{'vtpVlanName'}}) ) {
                 my $vlan_id_short = $vlan_id;
                 $vlan_id_short =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
                 $vlan_id_short =~ s/^.//;
@@ -555,8 +555,8 @@ sub queryDevice {
                 for my $link ( keys %{$params->{modellist}->{WALK}} ) {
                     if ($params->{modellist}->{WALK}->{$link}->{VLAN} == 1) {
                         $ArraySNMPwalk = $session->snmpWalk({
-                                oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
-                            });
+                            oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
+                        });
                         $HashDataSNMP->{VLAN}->{$vlan_id}->{$link} = $ArraySNMPwalk;
                     }
                 }
