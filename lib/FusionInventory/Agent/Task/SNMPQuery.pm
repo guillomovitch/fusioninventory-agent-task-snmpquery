@@ -193,36 +193,31 @@ sub startThreads {
     $ArgumentsThread{'PID'} = &share([]);
 
     # the queue of devices for each process
-    my $devicelist;
+    my $deviceslist;
 
     my $core = 0;
-    my $attribute_device = sub {
-        my $device = (@_);
-
-        return unless $device;
-
-        # restart from first core once CORE_QUERY has been reached
-        if ($core eq $params->{CORE_QUERY}) {
-            $core = 0;
-        }
-        push @{$devicelist->[$core]}, $device;
-        $core++;
-    };
 
     if (defined $options->{DEVICE}) {
         if (ref $options->{DEVICE} eq "HASH") {
             # a single device object
-            $attribute_device->($options->{DEVICE});
+            push @{$deviceslist->[$core]}, $options->{DEVICE};
         } else {
             # a list of items
             foreach my $item (@{$options->{DEVICE}}) {
                 if (ref $item eq "HASH") {
                     # a list of devices objects
-                    $attribute_device->($item);
+                    push
+                        @{$deviceslist->[$core % $params->{CORE_QUERY}]},
+                        $item;
+                    $core++;
                 } else {
                     # a list of list of devices objects
                     foreach my $device (@{$item}) {
-                        $attribute_device->($device);
+                        next unless $device;
+                        push 
+                            @{$deviceslist->[$core % $params->{CORE_QUERY}]},
+                            $device;
+                        $core++;
                     }
                 }
             }
@@ -329,7 +324,7 @@ sub startThreads {
                 $callback,
                 $i,
                 $j,
-                $devicelist->[$i],
+                $deviceslist->[$i],
                 $modelslist,
                 $authlist,
                 $self
