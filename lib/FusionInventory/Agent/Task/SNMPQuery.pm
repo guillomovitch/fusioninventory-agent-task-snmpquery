@@ -169,7 +169,10 @@ sub startThreads {
     Parallel::ForkManager->require();
     if ($EVAL_ERROR) {
         if ($params->{CORE_QUERY} > 1) {
-            $self->{logger}->debug("Parallel::ForkManager not installed, so only 1 core will be used...");
+            $self->{logger}->debug(
+                "Parallel::ForkManager not installed, only one process will " .
+                "be used..."
+            );
             $params->{CORE_QUERY} = 1;      
         }
     }
