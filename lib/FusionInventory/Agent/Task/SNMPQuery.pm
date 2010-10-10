@@ -266,7 +266,7 @@ sub startThreads {
     my $xml_Thread : shared = '';
     my %xml_out : shared;
     my $sendXML :shared = 0;
-    for(my $p = 0; $p < $params->{CORE_QUERY}; $p++) {
+    for (my $p = 0; $p < $params->{CORE_QUERY}; $p++) {
         if ($params->{CORE_QUERY} > 1) {
             my $pid = $pm->start and next;
         }
@@ -276,7 +276,7 @@ sub startThreads {
         my $sendbylwp : shared;
 
 # 0 : thread is alive, 1 : thread is dead 
-        for(my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
+        for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
             $TuerThread{$p}[$j]    = 0;
         }
         #==================================
@@ -294,7 +294,7 @@ sub startThreads {
         #===================================
         # Create all Threads
         #===================================
-        for(my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
+        for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
             $Thread[$p][$j] = threads->create( sub {
                     my $p = shift;
                     my $t = shift;
@@ -374,7 +374,7 @@ sub startThreads {
         while($exit == 0) {
             sleep 2;
             my $count = 0;
-            for(my $i = 0 ; $i < $params->{THREADS_QUERY} ; $i++) {
+            for (my $i = 0 ; $i < $params->{THREADS_QUERY} ; $i++) {
                 if ($TuerThread{$p}[$i] == 1) {
                     $count++;
                 }
