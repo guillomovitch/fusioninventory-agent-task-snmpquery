@@ -112,7 +112,6 @@ sub new {
     $SIG{INT} = sub {
         $self->{logger}->info("SIGINT received, exiting");
         $self->sendEndToServer();
-        return;
     };
 
     return $self;
