@@ -470,22 +470,19 @@ sub queryDevice {
         return;
     }
 
-    my $error = '';
     # Query for timeout #
     my $description = $session->snmpGet({
         oid => '.1.3.6.1.2.1.1.1.0',
         up  => 1,
     });
 
-    if ($description =~ m/No response from remote host/) {
-        return {
-            ERROR => {
-                ID   => $params->{device}->{ID},
-                TYPE => $params->{device}->{TYPE},
-                MESSAGE => "No response from remote host"
-            }
-        };
-    }
+    return {
+        ERROR => {
+            ID   => $params->{device}->{ID},
+            TYPE => $params->{device}->{TYPE},
+            MESSAGE => "No response from remote host"
+        }
+    } unless $description;
 
     # Query SNMP get #
     if ($params->{device}->{TYPE} eq "PRINTER") {
