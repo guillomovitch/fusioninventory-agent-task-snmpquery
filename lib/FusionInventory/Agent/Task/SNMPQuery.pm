@@ -217,18 +217,13 @@ sub startThreads {
                     if ($core_counter eq $params->{CORE_QUERY}) {
                         $core_counter = 0;
                     }
-                    $devicelist->{$core_counter}->{$countnb[$core_counter]} = {
-                        ID             => $options->{DEVICE}->{ID},
-                        IP             => $options->{DEVICE}->{IP},
-                        TYPE           => $options->{DEVICE}->{TYPE},
-                        AUTHSNMP_ID    => $options->{DEVICE}->{AUTHSNMP_ID},
-                        MODELSNMP_ID   => $options->{DEVICE}->{MODELSNMP_ID}
-                    };
+                    $devicelist->{$core_counter}->{$countnb[$core_counter]} = 
+                        $options->{DEVICE}
                     $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
                     $countnb[$core_counter]++;
                     $core_counter++;
                 } else {
-                    foreach my $num (@{$options->{DEVICE}->{$_}}) {
+                    foreach my $num (@{$options->{DEVICE}->{$type}}) {
                         if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
