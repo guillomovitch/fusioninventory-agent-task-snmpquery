@@ -235,33 +235,32 @@ sub startThreads {
             }
         } else {
             foreach my $device (@{$options->{DEVICE}}) {
-                if (defined $device) {
-                    if (ref $device eq "HASH") {
+                next unless $device;
+                if (ref $device eq "HASH") {
+                    if ($core_counter eq $params->{CORE_QUERY}) {
+                        $core_counter = 0;
+                    }
+                    #### MODIFIER
+                    $devicelist->{$core_counter}->{$countnb[$core_counter]} = {
+                        ID             => $device->{ID},
+                        IP             => $device->{IP},
+                        TYPE           => $device->{TYPE},
+                        AUTHSNMP_ID    => $device->{AUTHSNMP_ID},
+                        MODELSNMP_ID   => $device->{MODELSNMP_ID}
+                    };
+                    $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
+                    $countnb[$core_counter]++;
+                    $core_counter++;
+                } else {
+                    foreach my $num (@{$device}) {
                         if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
                         #### MODIFIER
-                        $devicelist->{$core_counter}->{$countnb[$core_counter]} = {
-                            ID             => $device->{ID},
-                            IP             => $device->{IP},
-                            TYPE           => $device->{TYPE},
-                            AUTHSNMP_ID    => $device->{AUTHSNMP_ID},
-                            MODELSNMP_ID   => $device->{MODELSNMP_ID}
-                        };
-                        $devicelist2{$core_counter}{$countnb[$core_counter]} = $countnb[$core_counter];
+                        $devicelist->{$core_counter}->{$countnb[$core_counter]} = $num;
+                        $devicelist2{$core_counter}[$countnb[$core_counter]] = $countnb[$core_counter];
                         $countnb[$core_counter]++;
                         $core_counter++;
-                    } else {
-                        foreach my $num (@{$device}) {
-                            if ($core_counter eq $params->{CORE_QUERY}) {
-                                $core_counter = 0;
-                            }
-                            #### MODIFIER
-                            $devicelist->{$core_counter}->{$countnb[$core_counter]} = $num;
-                            $devicelist2{$core_counter}[$countnb[$core_counter]] = $countnb[$core_counter];
-                            $countnb[$core_counter]++;
-                            $core_counter++;
-                        }
                     }
                 }
             }
