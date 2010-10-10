@@ -256,11 +256,11 @@ sub startThreads {
 
         my $xml_thread = {};                                                   
         my $count = 0;
-        my $loopthread = 0;
 
         $self->{logger}->debug("Core $p - Thread $t created");
 
-        while ($loopthread != 1) {
+        # infinite loop, until the exit condition is met
+        while (1) {
             # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
             $device_id = "";
             {
@@ -270,29 +270,28 @@ sub startThreads {
                     $device_id = pop @keys;
                     delete $devicelist2->[$p]->{$device_id};
                 } else {
-                    $loopthread = 1;
+                    last;
                 }
             }
-            if ($loopthread != 1) {
-                my $device = $devicelist->[$device_id];
-                my $datadevice = $self->query_device_threaded({
-                    device    => $device,
-                    modellist => $modelslist->{$device->{MODELSNMP_ID}},
-                    authlist  => $authlist->{$device->{AUTHSNMP_ID}}
-                });
-                $xml_thread->{DEVICE}->[$count] = $datadevice;
-                $xml_thread->{MODULEVERSION} = $VERSION;
-                $xml_thread->{PROCESSNUMBER} = $params->{PID};
-                $count++;
-                if ($count > 0) {
-                    $maxIdx++;
-                    $storage->save({
-                        idx => $maxIdx,
-                        data => $xml_thread
-                    });
 
-                    $count = 0;
-                }
+            my $device = $devicelist->[$device_id];
+            my $datadevice = $self->query_device_threaded({
+                device    => $device,
+                modellist => $modelslist->{$device->{MODELSNMP_ID}},
+                authlist  => $authlist->{$device->{AUTHSNMP_ID}}
+            });
+            $xml_thread->{DEVICE}->[$count] = $datadevice;
+            $xml_thread->{MODULEVERSION} = $VERSION;
+            $xml_thread->{PROCESSNUMBER} = $params->{PID};
+            $count++;
+            if ($count > 0) {
+                $maxIdx++;
+                $storage->save({
+                    idx => $maxIdx,
+                    data => $xml_thread
+                });
+
+                $count = 0;
             }
             sleep 1;
         }
