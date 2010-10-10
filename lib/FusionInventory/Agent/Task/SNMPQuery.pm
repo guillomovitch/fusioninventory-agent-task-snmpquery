@@ -208,8 +208,7 @@ sub startThreads {
 
     my $core_counter = 0;
     if (defined($options->{DEVICE})) {
-        if (ref($options->{DEVICE}) eq "HASH"){
-            #if (keys (%{$data->{DEVICE}}) == 0) {
+        if (ref($options->{DEVICE}) eq "HASH") {
             foreach my $type (@devicetype) {
                 next unless $options->{DEVICE}->{TYPE} eq $type;
                 if (ref($options->{DEVICE}) eq "HASH") {
@@ -236,8 +235,8 @@ sub startThreads {
             }
         } else {
             foreach my $device (@{$options->{DEVICE}}) {
-                if (defined($device)) {
-                    if (ref($device) eq "HASH"){
+                if (defined $device) {
+                    if (ref $device eq "HASH") {
                         if ($core_counter eq $params->{CORE_QUERY}) {
                             $core_counter = 0;
                         }
