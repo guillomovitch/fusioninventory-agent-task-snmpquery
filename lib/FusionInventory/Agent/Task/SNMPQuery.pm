@@ -192,19 +192,19 @@ sub startThreads {
     $ArgumentsThread{'Bin'} = &share([]);
     $ArgumentsThread{'PID'} = &share([]);
 
-    # number of devices assigned to a given core
+    # the number of devices for each process
     my $countnb;
 
     # gni ?
     my $devicelist;
 
-    # gni ?
+    # the queue of device id for each process
     my $devicelist2 :shared;
 
     # initialization
     for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
         $countnb->[$i] = 0;
-        $devicelist2->[$i] = &share({});
+        $devicelist2->[$i] = &share([]);
     }
 
     my $core = 0;
@@ -218,7 +218,7 @@ sub startThreads {
             $core = 0;
         }
         $devicelist->[$core]->{$countnb->[$core]} = $device;
-        $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
+        $devicelist2->[$core]->[$countnb->[$core]] = $countnb->[$core];
         $countnb->[$core]++;
         $core++;
     };
@@ -262,14 +262,11 @@ sub startThreads {
             # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
             my $device_id;
             {
+                # get the next device in this process queue, and exit the 
+                # loop if there isn't anymore
                 lock($devicelist2);
-                if (keys %{$devicelist2->[$p]} != 0) {
-                    my @keys = sort keys %{$devicelist2->[$p]};
-                    $device_id = pop @keys;
-                    delete $devicelist2->[$p]->{$device_id};
-                } else {
-                    last;
-                }
+                my $device_id = pop @{$devicelist2->[$p]};
+                last unless $device_id;
             }
 
             my $device = $devicelist->[$device_id];
