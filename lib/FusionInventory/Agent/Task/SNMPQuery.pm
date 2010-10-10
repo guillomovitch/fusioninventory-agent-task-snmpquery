@@ -283,7 +283,6 @@ sub startThreads {
         $params->{THREADS_QUERY} = @{$deviceslist->[0]};
     }
 
-    my $xml_Thread : shared = '';
     my $sendXML :shared = 0;
     for (my $i = 0; $i < $params->{CORE_QUERY}; $i++) {
         if ($params->{CORE_QUERY} > 1) {
