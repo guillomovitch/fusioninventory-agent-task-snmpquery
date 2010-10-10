@@ -182,8 +182,6 @@ sub startThreads {
     #===================================
     # Threads et variables partagÃ©es
     #===================================
-    my $TuerThread : shared;
-    my @Thread;
     my $sentxml = {};
 
     # the queue of devices for each process
@@ -265,7 +263,6 @@ sub startThreads {
             sleep 1;
         }
 
-        $TuerThread->[$p][$t] = 1;
         $self->{logger}->debug("Process $p - Thread $t deleted");
     };
 
@@ -290,19 +287,14 @@ sub startThreads {
         }
 #      write_pid();
         # create the threads
-        $TuerThread->[$i] = &share([]);
         my $sendbylwp : shared;
-
-# 0 : thread is alive, 1 : thread is dead 
-        for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
-            $TuerThread->[$i][$j]    = 0;
-        }
 
         #===================================
         # Create all Threads
         #===================================
+        my @threads;
         for (my $j = 0; $j < $params->{THREADS_QUERY}; $j++) {
-            $Thread[$i][$j] = threads->create(
+            my $thread = threads->create(
                 $callback,
                 $i,
                 $j,
@@ -310,7 +302,9 @@ sub startThreads {
                 $modelslist,
                 $authlist,
                 $self
-            )->detach();
+            );
+            push @threads, $thread;
+            $thread->detach();
             sleep 1;
         }
 
@@ -328,17 +322,17 @@ sub startThreads {
         });
 
         my $exit = 0;
+
         while($exit == 0) {
             sleep 2;
-            my $count = 0;
-            for (my $j = 0 ; $j < $params->{THREADS_QUERY} ; $j++) {
-                if ($TuerThread->[$i][$j] == 1) {
-                    $count++;
-                }
-                if ( $count eq $params->{THREADS_QUERY} ) {
-                    $exit = 1;
-                }
-            }
+
+            # check if all threads have exited
+            my @running =
+                grep { $_->is_running() }
+                @threads;
+                
+            $exit = 1 if @running == 0;
+
             foreach my $idx (1 .. $maxIdx) {
                 next if $sentxml->{$idx};
                 my $data = $storage->restore({
