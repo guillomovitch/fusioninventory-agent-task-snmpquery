@@ -211,16 +211,13 @@ sub startThreads {
     if (defined $options->{DEVICE}) {
         if (ref $options->{DEVICE} eq "HASH") {
             # a single device object
-            foreach my $type (@devicetype) {
-                next unless $options->{DEVICE}->{TYPE} eq $type;
-                if ($core eq $params->{CORE_QUERY}) {
-                    $core = 0;
-                }
-                $devicelist->[$core]->{$countnb->[$core]} = $options->{DEVICE};
-                $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
-                $countnb->[$core]++;
-                $core++;
+            if ($core eq $params->{CORE_QUERY}) {
+                $core = 0;
             }
+            $devicelist->[$core]->{$countnb->[$core]} = $options->{DEVICE};
+            $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
+            $countnb->[$core]++;
+            $core++;
         } else {
             # a list of devices objects
             foreach my $device (@{$options->{DEVICE}}) {
