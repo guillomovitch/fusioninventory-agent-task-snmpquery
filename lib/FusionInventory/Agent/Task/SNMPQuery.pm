@@ -562,7 +562,13 @@ sub queryDevice {
                     }
                     # Detect mac adress on each port
                     if ($datadevice->{INFO}->{COMMENTS} =~ /Cisco/) {
-                        FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC($HashDataSNMP,$datadevice,$vlan_id,$self, $params->{modellist}->{WALK});
+                        FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
+                            $HashDataSNMP,
+                            $datadevice,
+                            $vlan_id,
+                            $self,
+                            $params->{modellist}->{WALK}
+                        );
                     }
                     delete $HashDataSNMP->{VLAN}->{$vlan_id};
                 }
