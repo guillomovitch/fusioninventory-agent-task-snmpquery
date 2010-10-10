@@ -195,16 +195,12 @@ sub startThreads {
     # the number of devices for each process
     my $countnb;
 
-    # gni ?
+    # the queue of devices for each process
     my $devicelist;
-
-    # the queue of device id for each process
-    my $devicelist2 :shared;
 
     # initialization
     for (my $i = 0 ; $i < $params->{CORE_QUERY} ; $i++) {
         $countnb->[$i] = 0;
-        $devicelist2->[$i] = &share([]);
     }
 
     my $core = 0;
@@ -217,8 +213,7 @@ sub startThreads {
         if ($core eq $params->{CORE_QUERY}) {
             $core = 0;
         }
-        $devicelist->[$core]->{$countnb->[$core]} = $device;
-        $devicelist2->[$core]->[$countnb->[$core]] = $countnb->[$core];
+        push @{$devicelist->[$core]}, $device;
         $countnb->[$core]++;
         $core++;
     };
@@ -260,16 +255,15 @@ sub startThreads {
         # infinite loop, until the exit condition is met
         while (1) {
             # Lance la procÃ©dure et rÃ©cupÃ¨re le rÃ©sultat
-            my $device_id;
+            my $device;
             {
                 # get the next device in this process queue, and exit the 
                 # loop if there isn't anymore
-                lock($devicelist2);
-                my $device_id = pop @{$devicelist2->[$p]};
-                last unless $device_id;
+                lock($devicelist);
+                $device = pop @{$devicelist->[$p]};
+                last unless $device;
             }
 
-            my $device = $devicelist->[$device_id];
             my $datadevice = $self->query_device_threaded({
                 device    => $device,
                 modellist => $modelslist->{$device->{MODELSNMP_ID}},
