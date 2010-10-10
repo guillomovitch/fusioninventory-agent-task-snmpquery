@@ -284,7 +284,7 @@ sub startThreads {
                 $xml_thread->{MODULEVERSION} = $VERSION;
                 $xml_thread->{PROCESSNUMBER} = $params->{PID};
                 $count++;
-                if (($count == 1) || (($count > 0))) {
+                if ($count > 0) {
                     $maxIdx++;
                     $storage->save({
                         idx => $maxIdx,
