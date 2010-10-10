@@ -476,7 +476,6 @@ sub queryDevice {
         oid => '.1.3.6.1.2.1.1.1.0',
         up  => 1,
     });
-    my $insertXML = '';
     if ($description =~ m/No response from remote host/) {
         $error = "No response from remote host";
         $datadevice->{ERROR}->{ID} = $params->{device}->{ID};
