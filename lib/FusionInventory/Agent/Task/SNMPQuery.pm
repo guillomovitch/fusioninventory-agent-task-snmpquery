@@ -335,11 +335,12 @@ sub startThreads {
                             }
                         }
                         if ($loopthread != 1) {
+                            my $device = $devicelist->[$device_id];
                             my $datadevice = $self->query_device_threaded({
-                                    device              => $devicelist->[$device_id],
-                                    modellist           => $modelslist->{$devicelist->[$device_id]->{MODELSNMP_ID}},
-                                    authlist            => $authlist->{$devicelist->[$device_id]->{AUTHSNMP_ID}}
-                                });
+                                device    => $device,
+                                modellist => $modelslist->{$device->{MODELSNMP_ID}},
+                                authlist  => $authlist->{$device->{AUTHSNMP_ID}}
+                            });
                             $xml_thread->{DEVICE}->[$count] = $datadevice;
                             $xml_thread->{MODULEVERSION} = $VERSION;
                             $xml_thread->{PROCESSNUMBER} = $params->{PID};
