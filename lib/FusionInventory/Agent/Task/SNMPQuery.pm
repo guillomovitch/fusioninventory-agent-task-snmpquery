@@ -510,8 +510,8 @@ sub queryDevice {
     my $vlan_query = 0;
     foreach my $key (keys %{$params->{modellist}->{WALK}}) {
         $ArraySNMPwalk = $session->snmpWalk({
-                oid_start => $params->{modellist}->{WALK}->{$key}->{OID}
-            });
+            oid_start => $params->{modellist}->{WALK}->{$key}->{OID}
+        });
         $HashDataSNMP->{$key} = $ArraySNMPwalk;
         if (exists($params->{modellist}->{WALK}->{$key}->{VLAN})) {
             if ($params->{modellist}->{WALK}->{$key}->{VLAN} == 1) {
