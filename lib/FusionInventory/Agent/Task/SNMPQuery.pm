@@ -476,12 +476,15 @@ sub queryDevice {
         oid => '.1.3.6.1.2.1.1.1.0',
         up  => 1,
     });
+
     if ($description =~ m/No response from remote host/) {
-        $error = "No response from remote host";
-        $datadevice->{ERROR}->{ID} = $params->{device}->{ID};
-        $datadevice->{ERROR}->{TYPE} = $params->{device}->{TYPE};
-        $datadevice->{ERROR}->{MESSAGE} = $error;
-        return $datadevice;
+        return {
+            ERROR => {
+                ID   => $params->{device}->{ID},
+                TYPE => $params->{device}->{TYPE},
+                MESSAGE => "No response from remote host"
+            }
+        };
     } else {
         # Query SNMP get #
         if ($params->{device}->{TYPE} eq "PRINTER") {
