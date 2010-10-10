@@ -110,8 +110,7 @@ sub new {
     my $self = $class->SUPER::new();
 
     $SIG{INT} = sub {
-        warn "detection anormal end of runing program, will close it.\n";
-
+        $self->{logger}->info("SIGINT received, exiting");
         $self->sendEndToServer();
         return;
     };
