@@ -422,21 +422,19 @@ sub startThreads {
                     $exit = 1;
                 }
             }
-            foreach my $idx (1..$maxIdx) {
-                if (!defined($sentxml->{$idx})) {
-                    my $data = $storage->restore({
-                        idx => $idx
-                    });
-
-                    $self->sendInformations({
-                        data => $data
-                    });
-                    $sentxml->{$idx} = 1;
-                    $storage->remove({
-                        idx => $idx
-                    });
-                    sleep 1;
-                }
+            foreach my $idx (1 .. $maxIdx) {
+                next if $sentxml->{$idx};
+                my $data = $storage->restore({
+                    idx => $idx
+                });
+                $self->sendInformations({
+                    data => $data
+                });
+                $sentxml->{$idx} = 1;
+                $storage->remove({
+                    idx => $idx
+                });
+                sleep 1;
             }
         }
 
@@ -448,18 +446,16 @@ sub startThreads {
         $pm->wait_all_children;
     }
 
-    foreach my $idx (1..$maxIdx) {
-        if (!defined($sentxml->{$idx})) {
-            my $data = $storage->restore({
-                idx => $idx
-            });
-            $self->sendInformations({
-                data => $data
-            });
-            $sentxml->{$idx} = 1;
-            sleep 1;
-        }
-
+    foreach my $idx (1 .. $maxIdx) {
+        next if $sentxml->{$idx};
+        my $data = $storage->restore({
+            idx => $idx
+        });
+        $self->sendInformations({
+            data => $data
+        });
+        $sentxml->{$idx} = 1;
+        sleep 1;
     }
     $storage->removeSubDumps();
 
