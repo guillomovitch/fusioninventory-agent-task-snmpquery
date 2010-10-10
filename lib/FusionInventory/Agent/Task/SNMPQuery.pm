@@ -107,6 +107,7 @@ my @printer_percent_infos = (
 
 sub new {
     my ($class) = @_;
+
     my $self = $class->SUPER::new();
 
     $SIG{INT} = sub {
