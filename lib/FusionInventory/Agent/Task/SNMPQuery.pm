@@ -220,46 +220,6 @@ sub startThreads {
     # Auth SNMP
     my $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
 
-    my $callback = sub {
-        my ($p, $t, $devicelist, $modelslist, $authlist, $self) = @_;
-
-        my $xml_thread = {};                                                   
-        my $count = 0;
-
-        $self->{logger}->debug("Process $p - Thread $t created");
-
-        # infinite loop, until the exit condition is met
-        while (1) {
-            # get the next device in this process queue, and exit the 
-            # loop if there isn't anymore
-            my $device = pop @{$devicelist->[$p]};
-            last unless $device;
-
-            my $datadevice = $self->queryDevice({
-                device    => $device,
-                modellist => $modelslist->{$device->{MODELSNMP_ID}},
-                authlist  => $authlist->{$device->{AUTHSNMP_ID}}
-            });
-            $xml_thread->{DEVICE}->[$count] = $datadevice;
-            $xml_thread->{MODULEVERSION} = $VERSION;
-            $xml_thread->{PROCESSNUMBER} = $params->{PID};
-            $count++;
-            if ($count > 0) {
-                $maxIdx++;
-                $storage->save({
-                    idx => $maxIdx,
-                    data => $xml_thread
-                });
-
-                $count = 0;
-            }
-            sleep 1;
-        }
-
-        $self->{logger}->debug("Process $p - Thread $t deleted");
-    };
-
-
     #============================================
     # Begin ForkManager (multiple core / process)
     #============================================
@@ -287,13 +247,14 @@ sub startThreads {
         my @threads;
         for (my $j = 0; $j < $thread_number; $j++) {
             my $thread = threads->create(
-                $callback,
+                'handleDevices',
                 $i,
                 $j,
                 $deviceslist->[$i],
                 $modelslist,
                 $authlist,
-                $self
+                $self,
+                $params->{PID}
             );
             push @threads, $thread;
             $thread->detach();
@@ -435,6 +396,46 @@ sub getModelsList {
     }
 
     return $list;
+}
+
+sub handleDevices {
+    my ($p, $t, $devicelist, $modelslist, $authlist, $self, $pid) = @_;
+
+    my $storage = $self->{target}->getStorage();
+    my $xml_thread = {};                                                   
+    my $count = 0;
+
+    $self->{logger}->debug("Process $p - Thread $t created");
+
+    # infinite loop, until the exit condition is met
+    while (1) {
+        # get the next device in this process queue, and exit the 
+        # loop if there isn't anymore
+        my $device = pop @{$devicelist->[$p]};
+        last unless $device;
+
+        my $datadevice = $self->queryDevice({
+            device    => $device,
+            modellist => $modelslist->{$device->{MODELSNMP_ID}},
+            authlist  => $authlist->{$device->{AUTHSNMP_ID}}
+        });
+        $xml_thread->{DEVICE}->[$count] = $datadevice;
+        $xml_thread->{MODULEVERSION} = $VERSION;
+        $xml_thread->{PROCESSNUMBER} = $pid;
+        $count++;
+        if ($count > 0) {
+            $maxIdx++;
+            $storage->save({
+                idx => $maxIdx,
+                data => $xml_thread
+            });
+
+            $count = 0;
+        }
+        sleep 1;
+    }
+
+    $self->{logger}->debug("Process $p - Thread $t deleted");
 }
 
 sub queryDevice {
