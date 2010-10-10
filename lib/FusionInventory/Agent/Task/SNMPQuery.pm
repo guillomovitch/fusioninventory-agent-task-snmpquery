@@ -208,39 +208,35 @@ sub startThreads {
     }
 
     my $core = 0;
+    my $attribute_device = sub {
+        my $device = (@_);
+
+        return unless $device;
+
+        # restart from first core once CORE_QUERY has been reached
+        if ($core eq $params->{CORE_QUERY}) {
+            $core = 0;
+        }
+        $devicelist->[$core]->{$countnb->[$core]} = $device;
+        $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
+        $countnb->[$core]++;
+        $core++;
+    };
+
     if (defined $options->{DEVICE}) {
         if (ref $options->{DEVICE} eq "HASH") {
             # a single device object
-            if ($core eq $params->{CORE_QUERY}) {
-                $core = 0;
-            }
-            $devicelist->[$core]->{$countnb->[$core]} = $options->{DEVICE};
-            $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
-            $countnb->[$core]++;
-            $core++;
+            $attribute_device->($options->{DEVICE});
         } else {
-            # a list of devices objects
-            foreach my $device (@{$options->{DEVICE}}) {
-                next unless $device;
-                if (ref $device eq "HASH") {
-                    if ($core eq $params->{CORE_QUERY}) {
-                        $core = 0;
-                    }
-                    #### MODIFIER
-                    $devicelist->[$core]->{$countnb->[$core]} = $device;
-                    $devicelist2->[$core]->{$countnb->[$core]} = $countnb->[$core];
-                    $countnb->[$core]++;
-                    $core++;
+            # a list of items
+            foreach my $item (@{$options->{DEVICE}}) {
+                if (ref $item eq "HASH") {
+                    # a list of devices objects
+                    $attribute_device->($item);
                 } else {
-                    foreach my $num (@{$device}) {
-                        if ($core eq $params->{CORE_QUERY}) {
-                            $core = 0;
-                        }
-                        #### MODIFIER
-                        $devicelist->[$core]->{$countnb->[$core]} = $num;
-                        $devicelist2->[$core]->[$countnb->[$core]] = $countnb->[$core];
-                        $countnb->[$core]++;
-                        $core++;
+                    # a list of list of devices objects
+                    foreach my $device (@{$item}) {
+                        $attribute_device->($device);
                     }
                 }
             }
