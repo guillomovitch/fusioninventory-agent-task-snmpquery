@@ -310,12 +310,10 @@ sub startThreads {
         $ArgumentsThread{'Bin'}[$p] = &share([]);
         $ArgumentsThread{'PID'}[$p] = &share([]);
 
-        my $i = 0;
         my $Bin;
-        while ($i < $params->{THREADS_QUERY}) {
+        for (my $i = 0; $i < $params->{THREADS_QUERY}; $i++) {
             $ArgumentsThread{'Bin'}[$p][$i] = $Bin;
             $ArgumentsThread{'PID'}[$p][$i] = $self->{PID};
-            $i++;
         }
         #===================================
         # Create all Threads
