@@ -533,17 +533,16 @@ sub queryDevice {
     return $datadevice unless $datadevice->{INFO}->{TYPE} eq "NETWORKING";
 
     # Scan for each vlan (for specific switch manufacturer && model)
-    # Implique de recrÃ©er une session spÃ©cialement pour chaque vlan : communautÃ©@vlanID
     if ($vlan_query == 1) {
-        while ( my ($vlan_id, $vlan_name) = each (%{$HashDataSNMP->{'vtpVlanName'}}) ) {
-            my $vlan_id_short = $vlan_id;
-            $vlan_id_short =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
-            $vlan_id_short =~ s/^.//;
+        while (my ($id, $name) = each %{$HashDataSNMP->{'vtpVlanName'}}) {
+            my $short_id = $id;
+            $short_id =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
+            $short_id =~ s/^.//;
             #Initiate SNMP connection on this VLAN
             my $session = FusionInventory::Agent::SNMP->new({
                 version      => $params->{authlist}->{VERSION},
                 hostname     => $params->{device}->{IP},
-                community    => $params->{authlist}->{COMMUNITY}."@".$vlan_id_short,
+                community    => $params->{authlist}->{COMMUNITY}."@".$short_id,
                 username     => $params->{authlist}->{USERNAME},
                 authpassword => $params->{authlist}->{AUTHPASSWORD},
                 authprotocol => $params->{authlist}->{AUTHPROTOCOL},
@@ -553,13 +552,12 @@ sub queryDevice {
             });
 
             $ArraySNMPwalk = {};
-            #$HashDataSNMP  = {};
-            for my $link ( keys %{$params->{modellist}->{WALK}} ) {
+            for my $link (keys %{$params->{modellist}->{WALK}}) {
                 if ($params->{modellist}->{WALK}->{$link}->{VLAN} == 1) {
                     $ArraySNMPwalk = $session->snmpWalk({
                         oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
                     });
-                    $HashDataSNMP->{VLAN}->{$vlan_id}->{$link} = $ArraySNMPwalk;
+                    $HashDataSNMP->{VLAN}->{$id}->{$link} = $ArraySNMPwalk;
                 }
             }
             # Detect mac adress on each port
@@ -567,21 +565,34 @@ sub queryDevice {
                 FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
                     $HashDataSNMP,
                     $datadevice,
-                    $vlan_id,
+                    $id,
                     $self,
                     $params->{modellist}->{WALK}
                 );
             }
-            delete $HashDataSNMP->{VLAN}->{$vlan_id};
+            delete $HashDataSNMP->{VLAN}->{$id};
         }
     } else {
         if (defined ($datadevice->{INFO}->{COMMENTS})) {
             if ($datadevice->{INFO}->{COMMENTS} =~ /3Com IntelliJack/) {
-                FusionInventory::Agent::Task::SNMPQuery::ThreeCom::RewritePortOf225($datadevice, $self);
+                FusionInventory::Agent::Task::SNMPQuery::ThreeCom::RewritePortOf225(
+                    $datadevice,
+                    $self
+                );
             } elsif ($datadevice->{INFO}->{COMMENTS} =~ /3Com/) {
-                FusionInventory::Agent::Task::SNMPQuery::ThreeCom::GetMAC($HashDataSNMP,$datadevice,$self,$params->{modellist}->{WALK});
+                FusionInventory::Agent::Task::SNMPQuery::ThreeCom::GetMAC(
+                    $HashDataSNMP,
+                    $datadevice,
+                    $self,
+                    $params->{modellist}->{WALK}
+                );
             } elsif ($datadevice->{INFO}->{COMMENTS} =~ /ProCurve/) {
-                FusionInventory::Agent::Task::SNMPQuery::Procurve::GetMAC($HashDataSNMP,$datadevice,$self, $params->{modellist}->{WALK});
+                FusionInventory::Agent::Task::SNMPQuery::Procurve::GetMAC(
+                    $HashDataSNMP,
+                    $datadevice,
+                    $self,
+                    $params->{modellist}->{WALK}
+                );
             }
         }
     }
