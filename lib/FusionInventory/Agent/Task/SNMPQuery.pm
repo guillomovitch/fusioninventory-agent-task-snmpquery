@@ -141,13 +141,6 @@ sub run {
         return;
     }
 
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
-        localtime(time);
-    $hour = sprintf("%02d", $hour);
-    $min  = sprintf("%02d", $min);
-    $yday = sprintf("%04d", $yday);
-    $self->{PID} = $yday.$hour.$min;
-
     # what is this for ?
     push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 16 * 1024);
 
