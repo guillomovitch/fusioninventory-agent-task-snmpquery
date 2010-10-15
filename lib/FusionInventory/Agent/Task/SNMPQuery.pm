@@ -486,9 +486,7 @@ sub queryDevice {
                     oid => $params->{modellist}->{GET}->{$key}->{OID},
                     up  => 1,
                 });
-            if (defined $oid_result
-                && $oid_result ne ""
-                && $oid_result ne "noSuchObject") {
+            if ($oid_result) {
                 $HashDataSNMP->{$key} = $oid_result;
             }
         }
