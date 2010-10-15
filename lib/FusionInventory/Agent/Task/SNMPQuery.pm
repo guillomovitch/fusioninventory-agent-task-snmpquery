@@ -536,9 +536,9 @@ sub queryDevice {
                 hostname     => $params->{device}->{IP},
                 community    => $params->{authlist}->{COMMUNITY}."@".$short_id,
                 username     => $params->{authlist}->{USERNAME},
-                authpassword => $params->{authlist}->{AUTHPASSWORD},
+                authpassword => $params->{authlist}->{AUTHPASSPHRASE},
                 authprotocol => $params->{authlist}->{AUTHPROTOCOL},
-                privpassword => $params->{authlist}->{PRIVPASSWORD},
+                privpassword => $params->{authlist}->{PRIVPASSPHRASE},
                 privprotocol => $params->{authlist}->{PRIVPROTOCOL},
                 translate    => 1,
             });
