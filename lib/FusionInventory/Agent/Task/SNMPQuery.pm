@@ -481,15 +481,12 @@ sub queryDevice {
 
     # Query SNMP get #
     foreach my $key (keys %{$params->{modellist}->{GET}}) {
-        if ($params->{modellist}->{GET}->{$key}->{VLAN} == 0) {
-            my $oid_result = $session->snmpGet({
-                    oid => $params->{modellist}->{GET}->{$key}->{OID},
-                    up  => 1,
-                });
-            if ($oid_result) {
-                $HashDataSNMP->{$key} = $oid_result;
-            }
-        }
+        next unless $params->{modellist}->{GET}->{$key}->{VLAN} == 0;
+        my $oid_result = $session->snmpGet({
+            oid => $params->{modellist}->{GET}->{$key}->{OID},
+            up  => 1,
+        });
+        $HashDataSNMP->{$key} = $oid_result if $oid_result;
     }
     $datadevice->{INFO}->{ID} = $params->{device}->{ID};
     $datadevice->{INFO}->{TYPE} = $params->{device}->{TYPE};
