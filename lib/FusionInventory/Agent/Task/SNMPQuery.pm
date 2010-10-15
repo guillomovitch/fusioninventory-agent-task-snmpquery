@@ -481,9 +481,10 @@ sub queryDevice {
 
     # Query SNMP get #
     foreach my $key (keys %{$params->{modellist}->{GET}}) {
-        next unless $params->{modellist}->{GET}->{$key}->{VLAN} == 0;
+        my $value = $params->{modellist}->{GET}->{$key};
+        next unless $value->{VLAN} == 0;
         my $oid_result = $session->snmpGet({
-            oid => $params->{modellist}->{GET}->{$key}->{OID},
+            oid => $value->{OID},
             up  => 1,
         });
         $HashDataSNMP->{$key} = $oid_result if $oid_result;
@@ -496,12 +497,13 @@ sub queryDevice {
     # Query SNMP walk #
     my $vlan_query = 0;
     foreach my $key (keys %{$params->{modellist}->{WALK}}) {
+        my $value = $params->{modellist}->{WALK}->{$key};
         my $walk = $session->snmpWalk({
-            oid_start => $params->{modellist}->{WALK}->{$key}->{OID}
+            oid_start => $value->{OID}
         });
         $HashDataSNMP->{$key} = $walk;
-        if (exists($params->{modellist}->{WALK}->{$key}->{VLAN})) {
-            if ($params->{modellist}->{WALK}->{$key}->{VLAN} == 1) {
+        if (exists($value->{VLAN})) {
+            if ($value->{VLAN} == 1) {
                 $vlan_query = 1;
             }
         }
