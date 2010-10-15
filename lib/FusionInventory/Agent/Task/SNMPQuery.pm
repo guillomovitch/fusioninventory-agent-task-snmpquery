@@ -495,17 +495,16 @@ sub queryDevice {
     constructDataDeviceSimple($HashDataSNMP, $datadevice);
 
     # Query SNMP walk #
-    my $vlan_query = 0;
+    my $has_vlans = 0;
     foreach my $key (keys %{$params->{modellist}->{WALK}}) {
         my $value = $params->{modellist}->{WALK}->{$key};
         my $walk = $session->snmpWalk({
             oid_start => $value->{OID}
         });
         $HashDataSNMP->{$key} = $walk;
-        if (exists($value->{VLAN})) {
-            if ($value->{VLAN} == 1) {
-                $vlan_query = 1;
-            }
+
+        if ($value->{VLAN}) {
+            $has_vlans = 1;
         }
     }
 
@@ -522,7 +521,7 @@ sub queryDevice {
     return $datadevice unless $datadevice->{INFO}->{TYPE} eq "NETWORKING";
 
     # Scan for each vlan (for specific switch manufacturer && model)
-    if ($vlan_query == 1) {
+    if ($has_vlans) {
         while (my ($id, $name) = each %{$HashDataSNMP->{vtpVlanName}}) {
             my $short_id = $id;
             $short_id =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
