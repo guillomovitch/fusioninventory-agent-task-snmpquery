@@ -526,7 +526,7 @@ sub queryDevice {
 
     # Scan for each vlan (for specific switch manufacturer && model)
     if ($vlan_query == 1) {
-        while (my ($id, $name) = each %{$HashDataSNMP->{'vtpVlanName'}}) {
+        while (my ($id, $name) = each %{$HashDataSNMP->{vtpVlanName}}) {
             my $short_id = $id;
             $short_id =~ s/$params->{modellist}->{WALK}->{vtpVlanName}->{OID}//;
             $short_id =~ s/^.//;
@@ -600,9 +600,9 @@ sub constructDataDeviceSimple {
     }
 
     if (exists $data->{cpuuser}) {
-        $device->{INFO}->{CPU} = $data->{'cpuuser'} + $data->{'cpusystem'};
-        delete $data->{'cpuuser'};
-        delete $data->{'cpusystem'};
+        $device->{INFO}->{CPU} = $data->{cpuuser} + $data->{cpusystem};
+        delete $data->{cpuuser};
+        delete $data->{cpusystem};
     }
 
     foreach my $info (@infos) {
