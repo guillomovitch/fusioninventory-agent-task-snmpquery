@@ -539,7 +539,7 @@ sub queryDevice {
                 translate    => 1,
             });
 
-            for my $link (keys %{$params->{modellist}->{WALK}}) {
+            foreach my $link (keys %{$params->{modellist}->{WALK}}) {
                 if ($params->{modellist}->{WALK}->{$link}->{VLAN} == 1) {
                     my $walk = $session->snmpWalk({
                         oid_start => $params->{modellist}->{WALK}->{$link}->{OID}
@@ -858,7 +858,7 @@ sub putPercentOid {
 sub cartridgeSupport {
     my $params = shift;
 
-    for my $key (keys %{$params->{modellist}->{GET}}) {
+    foreach my $key (keys %{$params->{modellist}->{GET}}) {
         next unless
             $key eq "wastetoner"     ||
             $key eq "maintenancekit" ||
