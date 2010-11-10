@@ -5,6 +5,7 @@ use warnings;
 
 use FusionInventory::Agent::Task::SNMPQuery::Tools;
 
+# return mac address of each port
 sub GetMAC {
     my ($data, $device, $vlan_id, $index, $walk) = @_;
 
@@ -41,6 +42,7 @@ sub GetMAC {
     }
 }
 
+# return ports in trunk mode
 sub TrunkPorts {
     my ($data, $device, $index) = @_;
 
@@ -56,6 +58,7 @@ sub TrunkPorts {
     }
 }
 
+# return ports having connected device speaking CDP
 sub CDPPorts {
     my ($data, $device, $walk, $index) = @_;
 
