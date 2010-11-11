@@ -211,7 +211,7 @@ sub startThreads {
     my $modelslist = getModelsList($options);
 
     # Auth SNMP
-    my $authlist = FusionInventory::Agent::SNMP->getAuthList($options);
+    my $authlist = getAuthList($options);
 
     #============================================
     # Begin ForkManager (multiple core / process)
@@ -361,6 +361,18 @@ sub sendInformations {
         message => $xmlMsg,
         url     => $self->{target}->getUrl()
     });
+}
+
+sub getAuthsList {
+    my ($options) = @_;
+
+    my $list;
+
+    foreach my $auth (@{$options->{AUTHENTICATION}}) {
+        $list->{$auth->{ID}}, $auth;
+    }
+
+    return $list;
 }
 
 sub getModelsList {
