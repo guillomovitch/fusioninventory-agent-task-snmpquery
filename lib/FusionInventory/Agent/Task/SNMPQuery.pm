@@ -368,23 +368,13 @@ sub getModelsList {
 
     my $list;
 
-    if (ref($options->{MODEL}) eq "HASH") {
-        # a single model object
-        foreach my $item (@{$options->{MODEL}->{GET}}) {
-            $list->{$options->{MODEL}->{ID}}->{GET}->{$item->{OBJECT}} = $item;
+    # a list of model objects
+    foreach my $model (@{$options->{MODEL}}) {
+        foreach my $item (@{$model->{GET}}) {
+            $list->{$model->{ID}}->{GET}->{$item->{OBJECT}} = $item;
         }
-        foreach my $item (@{$options->{MODEL}->{WALK}}) {
-            $list->{$options->{MODEL}->{ID}}->{WALK}->{$item->{OBJECT}} = $item;
-        }
-    } else {
-        # a list of model objects
-        foreach my $model (@{$options->{MODEL}}) {
-            foreach my $item (@{$model->{GET}}) {
-                $list->{$model->{ID}}->{GET}->{$item->{OBJECT}} = $item;
-            }
-            foreach my $item (@{$model->{WALK}}) {
-                $list->{$model->{ID}}->{WALK}->{$item->{OBJECT}} = $item;
-            }
+        foreach my $item (@{$model->{WALK}}) {
+            $list->{$model->{ID}}->{WALK}->{$item->{OBJECT}} = $item;
         }
     }
 
