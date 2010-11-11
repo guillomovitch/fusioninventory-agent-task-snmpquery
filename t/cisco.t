@@ -4,7 +4,105 @@ use strict;
 
 use Test::More;
 use FusionInventory::Agent::Task::SNMPQuery::Cisco;
-plan tests => 3;
+
+my @mac_tests = (
+    # each item is an arrayref of three elements:
+    # - input data structure
+    # - output data structure
+    # - test explication
+    [
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                            ]
+                        },
+                        MAC => 'X',
+                    }
+                ]
+            }
+        },
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                                { MAC => '00 1C F6 C5 64 19' }
+                            ]
+                        },
+                        MAC => 'X',
+                    }
+                ]
+            }
+        },
+        'connection mac address retrieval'
+    ],
+    [
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                            ],
+                            CDP => undef,
+                        },
+                        MAC => 'X',
+                    }
+                ]
+            }
+        },
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                            ],
+                            CDP => undef,
+                        },
+                        MAC => 'X',
+                    }
+                ]
+            }
+        },
+        'connection mac address retrieval, connection has CDP'
+    ],
+    [
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                            ],
+                        },
+                        MAC => '00 1C F6 C5 64 19',
+                    }
+                ]
+            }
+        },
+        {
+            PORTS => {
+                PORT => [
+                    {
+                        CONNECTIONS => {
+                            CONNECTION => [
+                            ],
+                        },
+                        MAC => '00 1C F6 C5 64 19',
+                    }
+                ]
+            }
+        },
+        'connection mac address retrieval, same mac address as the port'
+    ],
+);
+
+plan tests => scalar @mac_tests;
 
 my $walk = {
     dot1dBasePortIfIndex => {
@@ -38,122 +136,14 @@ my $data = {
     }
 };
 
-my ($device, $expected);
+foreach my $test (@mac_tests) {
+    FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
+        $data, $test->[0], 1, $index, $walk
+    );
 
-$device = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                    ]
-                },
-                MAC => 'X',
-            }
-        ]
-    }
-};
-
-$expected = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                        { MAC => '00 1C F6 C5 64 19' }
-                    ]
-                },
-                MAC => 'X',
-            }
-        ]
-    }
-};
-
-
-FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
-    $data, $device, 1, $index, $walk
-);
-
-is_deeply(
-    $device,
-    $expected,
-    'connection mac address retrieval'
-);
-
-$device = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                    ],
-                    CDP => undef,
-                },
-                MAC => 'X',
-            }
-        ]
-    }
-};
-
-$expected = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                    ],
-                    CDP => undef,
-                },
-                MAC => 'X',
-            }
-        ]
-    }
-};
-
-FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
-    $data, $device, 1, $index, $walk
-);
-
-is_deeply(
-    $device,
-    $expected,
-    'connection mac address retrieval, connection has CDP'
-);
-
-$device = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                    ],
-                },
-                MAC => '00 1C F6 C5 64 19',
-            }
-        ]
-    }
-};
-
-$expected = {
-    PORTS => {
-        PORT => [
-            {
-                CONNECTIONS => {
-                    CONNECTION => [
-                    ],
-                },
-                MAC => '00 1C F6 C5 64 19',
-            }
-        ]
-    }
-};
-
-FusionInventory::Agent::Task::SNMPQuery::Cisco::GetMAC(
-    $data, $device, 1, $index, $walk
-);
-
-is_deeply(
-    $device,
-    $expected,
-    'connection mac address retrieval, same mac address as the port'
-);
+    is_deeply(
+        $test->[0],
+        $test->[1],
+        $test->[2],
+    );
+}
