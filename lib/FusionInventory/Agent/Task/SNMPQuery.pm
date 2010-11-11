@@ -379,10 +379,10 @@ sub getModelsList {
     } else {
         # a list of model objects
         foreach my $model (@{$options->{MODEL}}) {
-            foreach my $item ($model->{GET}) {
+            foreach my $item (@{$model->{GET}}) {
                 $list->{$model->{ID}}->{GET}->{$item->{OBJECT}} = $item;
             }
-            foreach my $item ($model->{WALK}) {
+            foreach my $item (@{$model->{WALK}}) {
                 $list->{$model->{ID}}->{WALK}->{$item->{OBJECT}} = $item;
             }
         }
